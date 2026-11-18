@@ -5,6 +5,7 @@ import { CodeBlock } from "../components/ui";
 const SECTIONS = [
   { id: "overview", title: "Overview" },
   { id: "quick-start", title: "Quick start" },
+  { id: "frameworks", title: "React and Next.js" },
   { id: "domains", title: "Domains" },
   { id: "networks", title: "Networks" },
   { id: "signing", title: "Signing" },
@@ -144,8 +145,48 @@ beacon.on("accountChanged", (address) => console.log(address));
 await beacon.logout();`}
           />
           <P>
+            <strong>Requirements:</strong> a modern browser. The package has no dependencies, includes TypeScript types, and
+            works as ESM or CommonJS. It is published on npm as{" "}
+            <a href="https://www.npmjs.com/package/@beaconmcu/auth" target="_blank" rel="noreferrer" className="underline">
+              @beaconmcu/auth
+            </a>
+            .
+          </P>
+          <P>
             That's it for local development. <C>beacon.getAddress()</C> returns the address (or <C>null</C> when signed
             out), and <C>beacon.getNetwork()</C> returns the active network.
+          </P>
+        </Section>
+
+        <Section id="frameworks" title="React and Next.js">
+          <P>
+            Create one <C>BeaconAuth</C> for the whole app, in its own file, and read it from your components:
+          </P>
+          <CodeBlock
+            language="tsx"
+            code={`// beacon.ts
+import { BeaconAuth } from "@beaconmcu/auth";
+export const beacon = new BeaconAuth({ clientId: "bcn_app_...", defaultNetwork: "testnet" });
+
+// LoginButton.tsx   (in Next.js, add "use client" at the top)
+import { useEffect, useState } from "react";
+import { beacon } from "./beacon";
+
+export function LoginButton() {
+  const [address, setAddress] = useState(beacon.getAddress());
+
+  useEffect(() => beacon.on("accountChanged", setAddress), []); // returns the function that unsubscribes
+
+  return address ? (
+    <button onClick={() => beacon.logout()}>Log out ({address.slice(0, 6)}…)</button>
+  ) : (
+    <button onClick={() => beacon.login()}>Log in</button>
+  );
+}`}
+          />
+          <P>
+            It is safe to import on the server, because it only touches the page in the browser. Call <C>login()</C>,{" "}
+            <C>sendPayment()</C> and the other methods from client-side code, such as event handlers and effects.
           </P>
         </Section>
 

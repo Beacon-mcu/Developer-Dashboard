@@ -62,7 +62,16 @@ console.log(address); // a Stellar address (G...)`;
           title="Get started"
           subtitle={
             <>
-              Install the package, then add this to your app.{" "}
+              Install{" "}
+              <a
+                href="https://www.npmjs.com/package/@beaconmcu/auth"
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-brand-text hover:underline"
+              >
+                @beaconmcu/auth
+              </a>
+              , then add this to your app.{" "}
               <Link to="/docs" className="font-medium text-brand-text hover:underline">
                 Read the docs
               </Link>
