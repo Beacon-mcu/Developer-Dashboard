@@ -27,7 +27,7 @@ const beacon = new BeaconAuth({
   defaultNetwork: "${network}",                 // optional. "testnet" or "mainnet". Defaults to the app's dashboard setting.
   supportedNetworks: ["testnet", "mainnet"],   // optional. Networks switchNetwork() may use. Defaults to just the default one.
   showWalletUI: true,                          // optional. false = sign low-risk requests (text messages, plain XLM payments) without a prompt.
-  walletUrl: "https://wallet.beaconmcu.space", // optional. Rarely needed.
+  walletUrl: "...",                            // optional. Beacon's wallet is built in, so leave this out.
 });
 
 Methods (async unless marked sync):

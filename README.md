@@ -1,7 +1,7 @@
 # Beacon dashboard
 
 Where developers create apps, get a Client ID, add their site's address and read the docs.
-Live at https://dashboard.beaconmcu.space.
+Live at https://dash.beaconmcu.space.
 
 ## Pages
 
@@ -42,16 +42,16 @@ OAuth client in Google Cloud Console (it already is).
 - Build command: `npm run build`
 - Deploy command: `npx wrangler deploy`
 - Root directory: `Dashboard` (or `/` if this folder is its own repo)
-- Add the custom domain `dashboard.beaconmcu.space` in the Worker's Domains tab once DNS is on Cloudflare.
+- Add the custom domain `dash.beaconmcu.space` in the Worker's Domains tab once DNS is on Cloudflare.
 - Also add the dashboard's address to the backend's CORS list (`backend/src/lib/cors.ts`) and to the Google OAuth
   client's authorized JavaScript origins.
 
 `VITE_API_URL` is read at build time: set it as a **build** variable (Settings → Build → Variables), or it will be
 `undefined` in the built site.
 
-The Playground opens the Beacon wallet. By default it uses `https://wallet.beaconmcu.space`. While that domain is not
-live, set `VITE_WALLET_URL` (also a build variable) to the wallet's workers.dev address. The wallet always allows the
-dashboard's own address to embed it (see `wallet/src/lib/origin.ts`).
+The Playground opens the Beacon wallet that is built into the SDK, so nothing needs configuring (SDK 0.1.3 and later;
+older versions need `VITE_WALLET_URL` set as a build variable). The wallet always allows the dashboard's own address to
+embed it (see `wallet/src/lib/origin.ts`).
 
 ## How it talks to the backend
 

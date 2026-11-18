@@ -391,7 +391,7 @@ const { signedTxXdr } = await wallet.signTransaction(xdr);
               [<C>defaultNetwork</C>, "the dashboard's network", <>"testnet" or "mainnet", used on login.</>],
               [<C>supportedNetworks</C>, "just the default", <>Networks <C>switchNetwork</C> may use.</>],
               [<C>showWalletUI</C>, "true", "false = sign low-risk requests without a prompt."],
-              [<C>walletUrl</C>, "https://wallet.beaconmcu.space", "Override for development."],
+              [<C>walletUrl</C>, "built in", "Optional. Only to test a different wallet."],
             ]}
           />
           <H3>Methods</H3>
