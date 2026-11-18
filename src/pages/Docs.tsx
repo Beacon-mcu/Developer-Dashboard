@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
-import { CodeBlock } from "../components/ui";
+import { CodeBlock, PromptBlock } from "../components/ui";
+import { buildPrompt } from "../lib/prompt";
 
 const SECTIONS = [
   { id: "overview", title: "Overview" },
+  { id: "build-with-ai", title: "Build with AI" },
   { id: "quick-start", title: "Quick start" },
   { id: "frameworks", title: "React and Next.js" },
   { id: "domains", title: "Domains" },
@@ -123,6 +125,19 @@ export function Docs() {
           </P>
         </Section>
 
+        <Section id="build-with-ai" title="Build with AI">
+          <P>
+            Want an AI assistant to build your app? Copy this prompt into Claude, ChatGPT, Cursor or any AI coding tool.
+            It explains Beacon completely: the install, every method, and the Stellar rules that trip people up. Replace the
+            line in square brackets with what you want to build, and paste it in.
+          </P>
+          <PromptBlock prompt={buildPrompt({ clientId: "bcn_app_YOUR_CLIENT_ID", network: "testnet" })} />
+          <P>
+            Open one of your apps in the dashboard to get the same prompt with that app's own Client ID and network already
+            filled in.
+          </P>
+        </Section>
+
         <Section id="quick-start" title="Quick start">
           <H3>1. Create an app</H3>
           <P>
@@ -235,11 +250,31 @@ export function LoginButton() {
 await beacon.switchNetwork("mainnet");
 beacon.on("networkChanged", (network) => console.log(network));`}
           />
+          <H3>Which network is used?</H3>
           <P>
-            Without <C>defaultNetwork</C>, your app's <strong>default network</strong> from the dashboard is used
-            (testnet if you haven't changed it). A network that is not in <C>supportedNetworks</C> is rejected with
-            error code <C>-6</C>. Every approval screen in the wallet shows the network and marks mainnet as real funds.
+            Each app has a <strong>default network</strong> in the dashboard (Settings). It is the fallback: it applies when
+            your code doesn't say. If your code sets <C>defaultNetwork</C>, the code wins.
           </P>
+          <Table
+            head={["Your code", "Dashboard setting", "The wallet uses"]}
+            rows={[
+              ["no defaultNetwork", "Mainnet", <strong key="a">Mainnet</strong>],
+              ["no defaultNetwork", "Testnet", <strong key="b">Testnet</strong>],
+              [<C key="c">defaultNetwork: "testnet"</C>, "Mainnet", <><strong>Testnet</strong> (the code wins)</>],
+              [<C key="d">defaultNetwork: "mainnet"</C>, "Testnet", <><strong>Mainnet</strong> (the code wins)</>],
+            ]}
+          />
+          <P>
+            A network that is not in <C>supportedNetworks</C> is rejected with error code <C>-6</C>. Without{" "}
+            <C>supportedNetworks</C>, the app can only use its default network. Every approval screen in the wallet shows
+            the network and marks mainnet as real funds.
+          </P>
+          <div className="rounded-xl border border-warn-line bg-warn-soft p-4 text-sm text-warn-text">
+            <strong>Call getNetwork() after login().</strong> Before the user signs in, the SDK has not heard from the
+            wallet yet, so if you did not set <C>defaultNetwork</C> in code it reports testnet even when your dashboard says
+            Mainnet. After login it reports the wallet's real network (and fires <C>networkChanged</C> if that differs).
+            Set <C>defaultNetwork</C> in code to avoid the gap.
+          </div>
           <H3>New accounts need funding</H3>
           <P>
             A Stellar account only exists after it receives at least <strong>1 XLM</strong>. On testnet, fund it for

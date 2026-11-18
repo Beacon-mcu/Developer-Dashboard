@@ -158,6 +158,36 @@ export function CodeBlock({ code, language }: { code: string; language?: string 
   );
 }
 
+// A long prompt to copy: a short scrollable preview and a prominent Copy button.
+export function PromptBlock({ prompt }: { prompt: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="overflow-hidden rounded-lg border border-line">
+      <div className="flex items-center justify-between gap-3 border-b border-line bg-subtle px-4 py-2.5">
+        <p className="text-sm font-medium text-ink">Prompt</p>
+        <Button
+          className="min-h-9 px-4 py-1.5 sm:min-h-9"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(prompt);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            } catch {
+              // clipboard blocked: the text can still be selected below
+            }
+          }}
+        >
+          <Icon name="copy" className="h-3.5 w-3.5" />
+          {copied ? "Copied" : "Copy prompt"}
+        </Button>
+      </div>
+      <pre className="max-h-72 overflow-auto whitespace-pre-wrap break-words bg-surface p-4 font-mono text-xs leading-relaxed text-ink-soft">
+        {prompt}
+      </pre>
+    </div>
+  );
+}
+
 // ---- dialog ----
 
 export function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
