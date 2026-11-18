@@ -113,6 +113,10 @@ export function Login() {
           Powered by Beacon · Built on Stellar ·{" "}
           <Link to="/privacy" className="underline">
             Privacy
+          </Link>{" "}
+          ·{" "}
+          <Link to="/terms" className="underline">
+            Terms
           </Link>
         </p>
       </section>

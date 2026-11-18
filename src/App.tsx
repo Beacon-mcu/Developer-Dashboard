@@ -8,6 +8,7 @@ import { Apps } from "./pages/Apps";
 import { Docs } from "./pages/Docs";
 import { Login } from "./pages/Login";
 import { Privacy } from "./pages/Privacy";
+import { Terms } from "./pages/Terms";
 import { AppLayout } from "./pages/app/AppLayout";
 import { DomainsPage } from "./pages/app/DomainsPage";
 import { Overview } from "./pages/app/Overview";
@@ -29,6 +30,7 @@ export function App() {
               <Route path="/" element={<Navigate to="/apps" replace />} />
               <Route path="/docs" element={<Docs />} />
               <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
               <Route
                 path="/apps"
                 element={
