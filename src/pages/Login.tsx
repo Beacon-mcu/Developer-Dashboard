@@ -109,7 +109,12 @@ export function Login() {
           </p>
         </div>
 
-        <p className="text-center text-xs text-muted">Powered by Beacon · Built on Stellar</p>
+        <p className="text-center text-xs text-muted">
+          Powered by Beacon · Built on Stellar ·{" "}
+          <Link to="/privacy" className="underline">
+            Privacy
+          </Link>
+        </p>
       </section>
 
       {/* ---- the pitch: large screens only ---- */}
