@@ -144,6 +144,12 @@ export function Docs() {
             In the <Link to="/apps" className="underline">dashboard</Link>, click Create app and give it a name. You get
             a public <strong>Client ID</strong> that looks like <C>bcn_app_xxxxxxxxxxxxxxxxxxxxxxxx</C>.
           </P>
+          <P>
+            <strong>Want to try it before writing any code?</strong> Open your app in the dashboard and choose{" "}
+            <strong>Playground</strong>. It is the real SDK and the real wallet: log in, switch network, sign a message and
+            send XLM, while a live log shows every call, answer and event. Each action shows the code that does it, ready to
+            copy.
+          </P>
           <H3>2. Install</H3>
           <CodeBlock language="bash" code="npm install @beaconmcu/auth" />
           <H3>3. Add login</H3>

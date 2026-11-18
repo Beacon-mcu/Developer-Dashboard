@@ -5,7 +5,12 @@ import { appsCache } from "../lib/cache";
 import { Icon, type IconName } from "./Icon";
 import { ProfileMenu } from "./ProfileMenu";
 
-const SECTION_LABELS: Record<string, string> = { users: "Users", settings: "Settings", domains: "Domains" };
+const SECTION_LABELS: Record<string, string> = {
+  playground: "Playground",
+  users: "Users",
+  settings: "Settings",
+  domains: "Domains",
+};
 
 function NavItem({ to, icon, label, end }: { to: string; icon: IconName; label: string; end?: boolean }) {
   return (
@@ -72,6 +77,7 @@ export function Shell() {
             <GroupLabel>{app ? app.name : "Current app"}</GroupLabel>
             <div className="space-y-0.5">
               <NavItem to={`/apps/${clientId}`} end icon="home" label="Overview" />
+              <NavItem to={`/apps/${clientId}/playground`} icon="play" label="Playground" />
               <NavItem to={`/apps/${clientId}/users`} icon="users" label="Users" />
               <NavItem to={`/apps/${clientId}/settings`} icon="settings" label="Settings" />
               <NavItem to={`/apps/${clientId}/domains`} icon="globe" label="Domains" />

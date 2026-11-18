@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./auth/AuthContext";
 import { RequireAuth } from "./components/RequireAuth";
@@ -11,6 +12,9 @@ import { DomainsPage } from "./pages/app/DomainsPage";
 import { Overview } from "./pages/app/Overview";
 import { SettingsPage } from "./pages/app/SettingsPage";
 import { UsersPage } from "./pages/app/UsersPage";
+import { Skeleton } from "./components/ui";
+
+const Playground = lazy(() => import("./pages/app/Playground"));
 
 export function App() {
   return (
@@ -40,6 +44,14 @@ export function App() {
                 }
               >
                 <Route index element={<Overview />} />
+                <Route
+                  path="playground"
+                  element={
+                    <Suspense fallback={<Skeleton className="h-96 w-full" />}>
+                      <Playground />
+                    </Suspense>
+                  }
+                />
                 <Route path="users" element={<UsersPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="domains" element={<DomainsPage />} />

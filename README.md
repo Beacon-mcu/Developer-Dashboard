@@ -10,6 +10,7 @@ Live at https://dashboard.beaconmcu.space.
 | `/login` | everyone | Sign in with Google |
 | `/apps` | signed in | All your apps; create one (name only) |
 | `/apps/:clientId` | signed in | Overview: users, network, domains, Client ID and the code to copy |
+| `/apps/:clientId/playground` | signed in | Try the SDK live: log in, switch network, sign, send, with a live log and the code for each action |
 | `/apps/:clientId/users` | signed in | Who has signed in to the app |
 | `/apps/:clientId/settings` | signed in | Name, default network, sign-in methods, delete the app |
 | `/apps/:clientId/domains` | signed in | Your live site addresses (localhost always works) |
@@ -47,6 +48,10 @@ OAuth client in Google Cloud Console (it already is).
 
 `VITE_API_URL` is read at build time: set it as a **build** variable (Settings → Build → Variables), or it will be
 `undefined` in the built site.
+
+The Playground opens the Beacon wallet. By default it uses `https://wallet.beaconmcu.space`. While that domain is not
+live, set `VITE_WALLET_URL` (also a build variable) to the wallet's workers.dev address. The wallet always allows the
+dashboard's own address to embed it (see `wallet/src/lib/origin.ts`).
 
 ## How it talks to the backend
 
