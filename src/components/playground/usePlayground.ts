@@ -4,6 +4,9 @@ import { explain } from "./explain";
 
 const WALLET_URL = import.meta.env.VITE_WALLET_URL || undefined; // undefined = the production wallet
 
+// The wallet this Playground opens, shown on the page and in the log so a wrong address is easy to spot.
+export const WALLET_ADDRESS = WALLET_URL ?? "https://wallet.beaconmcu.space";
+
 export type LogKind = "event" | "call" | "ok" | "error";
 export type LogEntry = { id: number; time: string; kind: LogKind; text: string };
 
@@ -37,7 +40,7 @@ export function usePlayground(clientId: string, defaultNetwork: NetworkId, silen
       supportedNetworks: ["testnet", "mainnet"],
       showWalletUI: !silent,
     });
-    log("event", `new BeaconAuth({ defaultNetwork: "${defaultNetwork}", showWalletUI: ${!silent} })`);
+    log("event", `new BeaconAuth({ defaultNetwork: "${defaultNetwork}", showWalletUI: ${!silent} })  wallet: ${WALLET_ADDRESS}`);
     setBeacon(instance);
     setNetwork(instance.getNetwork().id);
     setAddress(instance.getAddress());

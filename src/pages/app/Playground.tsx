@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { NETWORKS, type NetworkId } from "@beaconmcu/auth";
 import { EventLog } from "../../components/playground/EventLog";
 import { explain } from "../../components/playground/explain";
-import { usePlayground } from "../../components/playground/usePlayground";
+import { usePlayground, WALLET_ADDRESS } from "../../components/playground/usePlayground";
 import { Button, Card, CodeBlock, CopyButton, ErrorNote, Field, inputClass, PageHeader, SuccessNote, WarnNote } from "../../components/ui";
 import {
   fetchBalance,
@@ -43,7 +43,12 @@ export default function Playground() {
     <>
       <PageHeader
         title="Playground"
-        description="Try the SDK live with this app's Client ID. Everything here is the real wallet."
+        description={
+          <>
+            Try the SDK live with this app's Client ID. Everything here is the real wallet:{" "}
+            <code className="font-mono text-xs">{WALLET_ADDRESS}</code>
+          </>
+        }
       />
 
       <div className="mb-6">
@@ -144,8 +149,10 @@ function Connection(props: {
               {/did not load/i.test(error) && (
                 <>
                   {" "}
+                  Check that <code className="font-mono">{WALLET_ADDRESS}</code> opens in a new tab. If it does not, set{" "}
+                  <code className="font-mono">VITE_WALLET_URL</code> and restart. Otherwise check this app's{" "}
                   <Link to={`/apps/${props.appId}/domains`} className="font-medium underline">
-                    Check this app's Domains
+                    Domains
                   </Link>
                   .
                 </>
