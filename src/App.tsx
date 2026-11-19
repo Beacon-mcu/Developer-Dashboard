@@ -40,7 +40,7 @@ export function App() {
                 }
               />
               <Route
-                path="/apps/:clientId"
+                path="/apps/:appSlug"
                 element={
                   <RequireAuth>
                     <AppLayout />

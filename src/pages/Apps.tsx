@@ -82,7 +82,7 @@ export function Apps() {
           <ul className="divide-y divide-line">
             {apps.map((app) => (
               <li key={app.client_id} className={`px-4 py-4 transition hover:bg-subtle/60 sm:px-5 ${ROW_GRID}`}>
-                <Link to={`/apps/${app.client_id}`} className="block min-w-0 font-medium text-ink hover:text-brand-text">
+                <Link to={`/apps/${appsCache.slug(app)}`} className="block min-w-0 font-medium text-ink hover:text-brand-text">
                   <span className="block truncate">{app.name}</span>
                 </Link>
 

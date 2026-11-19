@@ -5,6 +5,7 @@ import { buildPrompt } from "../../lib/prompt";
 import { api } from "../../lib/api";
 import { formatDate } from "../../lib/format";
 import { useApp } from "./AppLayout";
+import { appsCache } from "../../lib/cache";
 
 export function Overview() {
   const { app } = useApp();
@@ -52,7 +53,7 @@ console.log(address); // a Stellar address (G...)`;
           </div>
           <p className="text-sm text-muted">
             Before you launch, add your live site's address under{" "}
-            <Link to={`/apps/${app.client_id}/domains`} className="font-medium text-brand-text hover:underline">
+            <Link to={`/apps/${appsCache.slug(app)}/domains`} className="font-medium text-brand-text hover:underline">
               Domains
             </Link>
             .

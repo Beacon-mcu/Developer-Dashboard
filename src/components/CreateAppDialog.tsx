@@ -20,7 +20,7 @@ export function CreateAppDialog({ onClose }: { onClose: () => void }) {
     try {
       const app = await api.createApp(trimmed);
       appsCache.upsert(app);
-      navigate(`/apps/${app.client_id}`);
+      navigate(`/apps/${appsCache.slug(app)}`);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not create the app.");
       setBusy(false);

@@ -13,6 +13,7 @@ import {
   trimAmount,
   verifyMessageSignature,
 } from "../../lib/stellarTools";
+import { appsCache } from "../../lib/cache";
 import { useApp } from "./AppLayout";
 
 const AMOUNT = /^\d+(\.\d{1,7})?$/;
@@ -79,7 +80,7 @@ export default function Playground() {
               log("ok", "Friendbot funded the account");
               refresh();
             }}
-            appId={app.client_id}
+            appSlug={appsCache.slug(app)}
           />
 
           {address && (
@@ -109,7 +110,7 @@ function Connection(props: {
   balanceFailed: boolean;
   ready: boolean;
   silent: boolean;
-  appId: string;
+  appSlug: string;
   onSilent: (value: boolean) => void;
   onRefresh: () => void;
   onLogin: () => Promise<unknown>;
@@ -151,7 +152,7 @@ function Connection(props: {
                   {" "}
                   Check that <code className="font-mono">{WALLET_ADDRESS}</code> opens in a new tab. If it does not, set{" "}
                   <code className="font-mono">VITE_WALLET_URL</code> and restart. Otherwise check this app's{" "}
-                  <Link to={`/apps/${props.appId}/domains`} className="font-medium underline">
+                  <Link to={`/apps/${props.appSlug}/domains`} className="font-medium underline">
                     Domains
                   </Link>
                   .

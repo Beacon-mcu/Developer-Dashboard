@@ -41,9 +41,9 @@ export function Shell() {
   const [drawer, setDrawer] = useState(false);
 
   // Which app (if any) is open: the sidebar shows that app's pages.
-  const appMatch = useMatch("/apps/:clientId/*");
-  const clientId = appMatch?.params.clientId;
-  const app = clientId ? appsCache.find(clientId) : null;
+  const appMatch = useMatch("/apps/:appSlug/*");
+  const appSlug = appMatch?.params.appSlug; // the app's name in the address, e.g. "my-app"
+  const app = appSlug ? appsCache.findBySlug(appSlug) : null;
   const section = appMatch?.params["*"]?.split("/")[0] ?? "";
 
   // Close the drawer after navigating.
@@ -72,15 +72,15 @@ export function Shell() {
           </>
         )}
 
-        {email && clientId && (
+        {email && appSlug && (
           <>
             <GroupLabel>{app ? app.name : "Current app"}</GroupLabel>
             <div className="space-y-0.5">
-              <NavItem to={`/apps/${clientId}`} end icon="home" label="Overview" />
-              <NavItem to={`/apps/${clientId}/playground`} icon="play" label="Playground" />
-              <NavItem to={`/apps/${clientId}/users`} icon="users" label="Users" />
-              <NavItem to={`/apps/${clientId}/settings`} icon="settings" label="Settings" />
-              <NavItem to={`/apps/${clientId}/domains`} icon="globe" label="Domains" />
+              <NavItem to={`/apps/${appSlug}`} end icon="home" label="Overview" />
+              <NavItem to={`/apps/${appSlug}/playground`} icon="play" label="Playground" />
+              <NavItem to={`/apps/${appSlug}/users`} icon="users" label="Users" />
+              <NavItem to={`/apps/${appSlug}/settings`} icon="settings" label="Settings" />
+              <NavItem to={`/apps/${appSlug}/domains`} icon="globe" label="Domains" />
             </div>
           </>
         )}
@@ -123,14 +123,14 @@ export function Shell() {
                 <span className="font-medium text-ink">Documentation</span>
               ) : (
                 <>
-                  <Link to="/apps" className={clientId ? "text-muted hover:text-ink" : "font-medium text-ink"}>
+                  <Link to="/apps" className={appSlug ? "text-muted hover:text-ink" : "font-medium text-ink"}>
                     Apps
                   </Link>
-                  {clientId && (
+                  {appSlug && (
                     <>
                       <span className="text-muted">/</span>
                       <Link
-                        to={`/apps/${clientId}`}
+                        to={`/apps/${appSlug}`}
                         className={`truncate ${section ? "text-muted hover:text-ink" : "font-medium text-ink"}`}
                       >
                         {app?.name ?? "App"}
