@@ -6,7 +6,7 @@ import { Button, Card, ErrorNote, Skeleton } from "./ui";
 const PAGE_SIZE = 20;
 
 // The people who have signed in to this app: how many, and who.
-// A table on wider screens; stacked rows on a phone.
+// A table on every screen; on a phone it scrolls sideways.
 export function UsersTable({ clientId }: { clientId: string }) {
   const [page, setPage] = useState(0);
   const [data, setData] = useState<{ total: number; users: AppUser[] } | null>(null);
@@ -45,44 +45,34 @@ export function UsersTable({ clientId }: { clientId: string }) {
 
       {data && data.users.length > 0 && (
         <>
-          {/* wider screens: a table */}
-          <div className="hidden overflow-x-auto sm:block">
-            <table className="w-full text-left text-sm">
+          {/* a table on every screen size; on a phone it scrolls sideways inside its box */}
+          <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+            <table className="w-full min-w-[34rem] text-left text-sm">
               <thead>
                 <tr className="border-b border-line text-xs text-muted">
-                  <th className="py-2 pr-4 font-medium">Wallet</th>
-                  <th className="py-2 pr-4 font-medium">Email</th>
-                  <th className="py-2 pr-4 font-medium">First seen</th>
-                  <th className="py-2 font-medium">Last seen</th>
+                  <th className="whitespace-nowrap py-2 pr-4 font-medium">Wallet</th>
+                  <th className="whitespace-nowrap py-2 pr-4 font-medium">Email</th>
+                  <th className="whitespace-nowrap py-2 pr-4 font-medium">First seen</th>
+                  <th className="whitespace-nowrap py-2 font-medium">Last seen</th>
                 </tr>
               </thead>
               <tbody>
                 {data.users.map((user) => (
                   <tr key={user.address} className="border-b border-line">
-                    <td className="py-2 pr-4 font-mono text-xs" title={user.address}>
+                    <td className="whitespace-nowrap py-2.5 pr-4 font-mono text-xs" title={user.address}>
                       {shortAddress(user.address)}
                     </td>
-                    <td className="py-2 pr-4">{user.email ?? "—"}</td>
-                    <td className="py-2 pr-4 text-muted">{formatDate(user.first_seen)}</td>
-                    <td className="py-2 text-muted">{formatDate(user.last_seen)}</td>
+                    <td className="max-w-[16rem] truncate py-2.5 pr-4" title={user.email ?? undefined}>
+                      {user.email ?? "—"}
+                    </td>
+                    <td className="whitespace-nowrap py-2.5 pr-4 text-muted">{formatDate(user.first_seen)}</td>
+                    <td className="whitespace-nowrap py-2.5 text-muted">{formatDate(user.last_seen)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-
-          {/* phones: one card per user */}
-          <ul className="space-y-2 sm:hidden">
-            {data.users.map((user) => (
-              <li key={user.address} className="rounded-xl border border-line p-3 text-sm">
-                <p className="break-all font-mono text-xs">{user.address}</p>
-                <p className="mt-1 text-ink-soft">{user.email ?? "—"}</p>
-                <p className="mt-1 text-xs text-muted">
-                  First seen {formatDate(user.first_seen)} · last seen {formatDate(user.last_seen)}
-                </p>
-              </li>
-            ))}
-          </ul>
+          <p className="text-xs text-muted sm:hidden">Swipe the table sideways to see every column.</p>
 
           {pages > 1 && (
             <div className="flex items-center justify-between gap-2 pt-1">

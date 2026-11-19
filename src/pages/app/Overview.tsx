@@ -33,7 +33,7 @@ console.log(address); // a Stellar address (G...)`;
     <>
       <PageHeader title={app.name} description={`Created ${formatDate(app.created_at)}`} />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[repeat(3,minmax(0,1fr))]">
         <Stat label="Users" value={users === null ? "–" : users} hint="People who signed in through this app" />
         <Stat label="Default network" value={app.network === "mainnet" ? "Mainnet" : "Testnet"} hint={app.network === "mainnet" ? "Real funds" : "Free test XLM"} />
         <Stat
@@ -43,13 +43,13 @@ console.log(address); // a Stellar address (G...)`;
         />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[repeat(2,minmax(0,1fr))]">
         <Card title="Client ID" subtitle="Public. Put it in your code to connect your app to Beacon.">
-          <div className="flex items-center gap-2">
-            <code className="min-w-0 flex-1 truncate rounded-lg bg-subtle px-3 py-2.5 font-mono text-sm text-ink">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <code className="min-w-0 flex-1 break-all rounded-lg bg-subtle px-3 py-2.5 font-mono text-xs text-ink sm:text-sm">
               {app.client_id}
             </code>
-            <CopyButton text={app.client_id} />
+            <CopyButton text={app.client_id} label="Copy ID" />
           </div>
           <p className="text-sm text-muted">
             Before you launch, add your live site's address under{" "}

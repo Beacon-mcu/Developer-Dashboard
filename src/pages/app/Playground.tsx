@@ -59,7 +59,7 @@ export default function Playground() {
         </WarnNote>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
         <div className="min-w-0 space-y-6">
           <Connection
             address={address}
@@ -84,7 +84,7 @@ export default function Playground() {
           />
 
           {address && (
-            <div className="grid gap-6 2xl:grid-cols-2">
+            <div className="grid grid-cols-[minmax(0,1fr)] gap-6 2xl:grid-cols-[repeat(2,minmax(0,1fr))]">
               <SignMessage address={address} call={call} />
               <SendPayment network={network} balance={balance} call={call} onSent={refresh} />
             </div>
@@ -355,7 +355,7 @@ function SendPayment({
       <Field label="To">
         <input className={inputClass} value={to} onChange={(e) => setTo(e.target.value)} placeholder="G…" spellCheck={false} />
       </Field>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-[repeat(2,minmax(0,1fr))]">
         <Field label="Amount (XLM)">
           <input className={inputClass} value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="1.5" inputMode="decimal" />
         </Field>

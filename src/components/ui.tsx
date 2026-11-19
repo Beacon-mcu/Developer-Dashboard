@@ -36,7 +36,7 @@ export function Card({
 }) {
   return (
     <section
-      className={`rounded-xl border bg-surface p-4 sm:p-6 ${tone === "danger" ? "border-danger-line" : "border-line"}`}
+      className={`min-w-0 rounded-xl border bg-surface p-4 sm:p-6 ${tone === "danger" ? "border-danger-line" : "border-line"}`}
     >
       {title && <h2 className="text-base font-semibold text-ink">{title}</h2>}
       {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
@@ -47,7 +47,7 @@ export function Card({
 
 export function Stat({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
   return (
-    <div className="rounded-xl border border-line bg-surface p-4 sm:p-5">
+    <div className="min-w-0 rounded-xl border border-line bg-surface p-4 sm:p-5">
       <p className="text-sm text-muted">{label}</p>
       <p className="mt-1 text-2xl font-semibold tracking-tight text-ink">{value}</p>
       {hint && <p className="mt-1 text-xs text-muted">{hint}</p>}
@@ -146,12 +146,12 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
 // A code sample with a copy button. Always dark, in both themes.
 export function CodeBlock({ code, language }: { code: string; language?: string }) {
   return (
-    <div className="relative rounded-lg bg-code text-slate-100">
+    <div className="relative min-w-0 max-w-full rounded-lg bg-code text-slate-100">
       <div className="absolute right-2 top-2 flex items-center gap-2">
         {language && <span className="text-xs text-slate-500">{language}</span>}
         <CopyButton text={code} label="" />
       </div>
-      <pre className="overflow-x-auto p-4 pr-24 font-mono text-xs leading-relaxed">
+      <pre className="overflow-x-auto p-4 pr-16 font-mono text-xs leading-relaxed sm:pr-24">
         <code>{code}</code>
       </pre>
     </div>
@@ -162,7 +162,7 @@ export function CodeBlock({ code, language }: { code: string; language?: string 
 export function PromptBlock({ prompt }: { prompt: string }) {
   const [copied, setCopied] = useState(false);
   return (
-    <div className="overflow-hidden rounded-lg border border-line">
+    <div className="min-w-0 overflow-hidden rounded-lg border border-line">
       <div className="flex items-center justify-between gap-3 border-b border-line bg-subtle px-4 py-2.5">
         <p className="text-sm font-medium text-ink">Prompt</p>
         <Button
