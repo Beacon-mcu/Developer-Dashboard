@@ -7,6 +7,7 @@ import { ThemeProvider } from "./lib/theme";
 import { Apps } from "./pages/Apps";
 import { Docs } from "./pages/Docs";
 import { Login } from "./pages/Login";
+import { Pricing } from "./pages/Pricing";
 import { Privacy } from "./pages/Privacy";
 import { Terms } from "./pages/Terms";
 import { AppLayout } from "./pages/app/AppLayout";
@@ -29,6 +30,8 @@ export function App() {
             <Route element={<Shell />}>
               <Route path="/" element={<Navigate to="/apps" replace />} />
               <Route path="/docs" element={<Docs />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/billing" element={<Navigate to="/pricing" replace />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
               <Route

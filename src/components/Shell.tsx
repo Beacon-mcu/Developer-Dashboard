@@ -121,6 +121,8 @@ export function Shell() {
             <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-sm lg:flex">
               {location.pathname.startsWith("/docs") ? (
                 <span className="font-medium text-ink">Documentation</span>
+              ) : location.pathname.startsWith("/pricing") ? (
+                <span className="font-medium text-ink">Pricing</span>
               ) : (
                 <>
                   <Link to="/apps" className={appSlug ? "text-muted hover:text-ink" : "font-medium text-ink"}>
@@ -148,7 +150,17 @@ export function Shell() {
             </nav>
           </div>
 
-          <ProfileMenu />
+          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
+            <NavLink
+              to="/pricing"
+              className={({ isActive }) =>
+                `rounded-md px-2.5 py-1.5 text-sm font-medium transition ${isActive ? "text-ink" : "text-muted hover:text-ink"}`
+              }
+            >
+              Pricing
+            </NavLink>
+            <ProfileMenu />
+          </div>
         </header>
 
         <main className="px-4 py-6 sm:px-6 lg:px-10 lg:py-8">

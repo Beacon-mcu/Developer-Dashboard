@@ -16,6 +16,7 @@ const PATHS = {
   plus: "M12 5v14M5 12h14",
   copy: "M9 9h10v10H9zM5 15V5h10",
   chevron: "M6 9l6 6 6-6",
+  check: "M5 12.5l4.5 4.5L19 7.5",
 } as const;
 
 export type IconName = keyof typeof PATHS;

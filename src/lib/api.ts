@@ -18,6 +18,30 @@ export type AppUser = {
   last_seen: number;
 };
 
+export type PlanInfo = {
+  id: string;
+  name: string;
+  launch: boolean;
+  price: { monthly: number; yearly: number } | null;
+  limits: { monthlyActiveUsers: number | null; apps: number | null };
+  overage: { per: number; price: number } | null;
+  networks: string[];
+  removePoweredByBeacon: boolean;
+  support: string;
+  purchasable: { month: boolean; year: boolean };
+};
+
+export type Billing = {
+  plan: string;
+  status: string | null;
+  interval: string | null;
+  currentPeriodEnd: number | null;
+  cancelAtPeriodEnd: boolean;
+  limits: { monthlyActiveUsers: number | null; apps: number | null } | null;
+  usage: { apps: number; monthlyActiveUsers: number };
+  plans: PlanInfo[];
+};
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -74,6 +98,15 @@ export const api = {
       method: "POST",
       body: { idToken },
     }),
+
+  plans: () => request<{ plans: PlanInfo[] }>("/pricing").then((r) => r.plans),
+  billing: () => request<Billing>("/dev/billing"),
+  cancelSubscription: () => request<{ ok: true }>("/dev/billing/cancel", { method: "POST", body: {} }),
+  billingPortal: () => request<{ url: string }>("/dev/billing/portal", { method: "POST", body: {} }).then((r) => r.url),
+  checkout: (plan: string, interval: "month" | "year") =>
+    request<{ checkoutUrl: string }>("/dev/billing/checkout", { method: "POST", body: { plan, interval } }).then(
+      (r) => r.checkoutUrl,
+    ),
 
   listApps: () => request<{ apps: App[] }>("/dev/apps").then((r) => r.apps),
 

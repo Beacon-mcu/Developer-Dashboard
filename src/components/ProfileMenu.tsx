@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { api } from "../lib/api";
 import { useTheme } from "../lib/theme";
 import { Icon } from "./Icon";
 
@@ -10,6 +11,23 @@ export function ProfileMenu() {
   const { email, signOut } = useAuth();
   const { theme, toggle } = useTheme();
   const [open, setOpen] = useState(false);
+  const [plan, setPlan] = useState<string | null>(null); // the developer's plan name, read when the menu opens
+
+  useEffect(() => {
+    if (!open || !email) return;
+    let cancelled = false;
+    api
+      .billing()
+      .then((b) => {
+        if (cancelled) return;
+        const name = b.plans.find((p) => p.id === b.plan)?.name ?? b.plan;
+        setPlan(b.status === "past_due" ? `${name} (payment failed)` : name);
+      })
+      .catch(() => undefined); // the menu works without it
+    return () => {
+      cancelled = true;
+    };
+  }, [open, email]);
   const rootRef = useRef<HTMLDivElement>(null);
 
   // Close on a click elsewhere or Escape.
@@ -62,6 +80,13 @@ export function ProfileMenu() {
           </div>
           <div className="my-1 border-t border-line" />
 
+          <Link role="menuitem" to="/pricing" className={`${item} justify-between`} onClick={() => setOpen(false)}>
+            <span className="flex items-center gap-3">
+              <Icon name="check" />
+              Plan
+            </span>
+            <span className="text-xs font-medium text-brand-text">{plan ?? "…"}</span>
+          </Link>
           <button role="menuitem" className={item} onClick={toggle}>
             <Icon name={theme === "dark" ? "sun" : "moon"} />
             {theme === "dark" ? "Light theme" : "Dark theme"}

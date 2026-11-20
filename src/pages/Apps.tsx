@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { CreateAppDialog } from "../components/CreateAppDialog";
+import { UsageNotice } from "../components/UsageNotice";
 import { Icon } from "../components/Icon";
 import { Button, CopyButton, ErrorNote, PageHeader, Skeleton } from "../components/ui";
 import { api, type App } from "../lib/api";
@@ -27,6 +28,7 @@ export function Apps() {
 
   return (
     <>
+      <UsageNotice />
       <PageHeader
         title="Apps"
         description="Each app has its own Client ID, domains and users."
