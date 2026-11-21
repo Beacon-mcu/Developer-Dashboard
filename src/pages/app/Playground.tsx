@@ -72,6 +72,7 @@ export default function Playground() {
             onRefresh={refresh}
             onLogin={() => call("beacon.login()", (b) => b.login())}
             onLogout={() => call("beacon.logout()", (b) => b.logout())}
+            onExport={() => call("beacon.exportWallet()", (b) => b.exportWallet())}
             onSwitch={(id) => call(`beacon.switchNetwork("${id}")`, (b) => b.switchNetwork(id))}
             onFund={async () => {
               if (!net.friendbotUrl || !address) return;
@@ -115,6 +116,7 @@ function Connection(props: {
   onRefresh: () => void;
   onLogin: () => Promise<unknown>;
   onLogout: () => Promise<unknown>;
+  onExport: () => Promise<unknown>;
   onSwitch: (id: NetworkId) => Promise<unknown>;
   onFund: () => Promise<void>;
 }) {
@@ -221,6 +223,9 @@ function Connection(props: {
           <div className="flex flex-wrap items-center gap-3">
             <Button variant="ghost" onClick={props.onRefresh}>
               Refresh balance
+            </Button>
+            <Button variant="ghost" onClick={() => run(null, props.onExport)}>
+              Back up key
             </Button>
             <Button variant="ghost" onClick={() => run(null, props.onLogout)}>
               Log out

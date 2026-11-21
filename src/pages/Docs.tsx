@@ -1,22 +1,38 @@
 import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { CodeBlock, PromptBlock } from "../components/ui";
 import { buildPrompt } from "../lib/prompt";
 
-const SECTIONS = [
+const GUIDE_SECTIONS = [
   { id: "overview", title: "Overview" },
   { id: "build-with-ai", title: "Build with AI" },
   { id: "quick-start", title: "Quick start" },
   { id: "frameworks", title: "React and Next.js" },
   { id: "domains", title: "Domains" },
+  { id: "email", title: "Email" },
+  { id: "passkeys", title: "Passkeys" },
   { id: "networks", title: "Networks" },
   { id: "signing", title: "Signing" },
+  { id: "backup", title: "Back up the key" },
   { id: "silent-signing", title: "Silent signing" },
   { id: "wallet-libraries", title: "Wallet libraries" },
   { id: "reference", title: "Options, events and errors" },
   { id: "security", title: "Security" },
   { id: "faq", title: "FAQ" },
 ];
+
+const WALLET_SECTIONS = [
+  { id: "enable", title: "Turn it on" },
+  { id: "use", title: "Use it" },
+  { id: "differences", title: "What is different" },
+  { id: "errors", title: "Handle errors" },
+  { id: "verify", title: "Verify an address" },
+];
+
+const TABS = [
+  { id: "guide", title: "Guide" },
+  { id: "external-wallets", title: "External wallets" },
+] as const;
 
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
@@ -65,6 +81,11 @@ function Table({ head, rows }: { head: string[]; rows: ReactNode[][] }) {
 }
 
 export function Docs() {
+  const [params, setParams] = useSearchParams();
+  const { hash } = useLocation();
+  const tab = params.get("tab") === "external-wallets" || hash === "#external-wallets" ? "external-wallets" : "guide";
+  const SECTIONS = tab === "external-wallets" ? WALLET_SECTIONS : GUIDE_SECTIONS;
+
   return (
     <div className="xl:grid xl:grid-cols-[minmax(0,1fr)_13rem] xl:gap-12">
       <aside className="hidden xl:order-2 xl:block">
@@ -106,6 +127,29 @@ export function Docs() {
           </label>
         </div>
 
+        <div role="tablist" aria-label="Docs" className="flex gap-1 border-b border-line">
+          {TABS.map((item) => (
+            <button
+              key={item.id}
+              role="tab"
+              aria-selected={tab === item.id}
+              onClick={() => {
+                setParams(item.id === "guide" ? {} : { tab: item.id }, { replace: true });
+                window.scrollTo({ top: 0 });
+              }}
+              className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-medium transition ${
+                tab === item.id ? "border-brand text-brand-text" : "border-transparent text-muted hover:text-ink"
+              }`}
+            >
+              {item.title}
+            </button>
+          ))}
+        </div>
+
+        {tab === "external-wallets" ? (
+          <ExternalWalletsTab />
+        ) : (
+          <>
         <Section id="overview" title="Overview">
           <P>
             Beacon gives every Google account a Stellar wallet. Your users click Login, sign in with Google, and can
@@ -166,10 +210,26 @@ beacon.on("accountChanged", (address) => console.log(address));
 await beacon.logout();`}
           />
           <P>
-            <strong>Requirements:</strong> a modern browser. The package has no dependencies, includes TypeScript types, and
+            <strong>Requirements:</strong> a modern browser. The package includes TypeScript types and
             works as ESM or CommonJS. It is published on npm as{" "}
             <a href="https://www.npmjs.com/package/@beaconmcu/auth" target="_blank" rel="noreferrer" className="underline">
               @beaconmcu/auth
+            </a>
+            .
+          </P>
+          <H3>4. Add a "Back up key" button</H3>
+          <P>
+            Every wallet made with Google or a passkey has a secret key the user may want to keep. Always give signed-in users
+            a way to back it up. It takes one call (version 0.1.13 or newer):
+          </P>
+          <CodeBlock
+            language="ts"
+            code={`<button onClick={() => beacon.exportWallet()}>Back up key</button>`}
+          />
+          <P>
+            The key appears only inside the Beacon window, after the user signs in again. Your app never receives it. See{" "}
+            <a href="#backup" className="underline">
+              Back up the key
             </a>
             .
           </P>
@@ -238,6 +298,40 @@ export function LoginButton() {
             for localhost). You can add up to 10. If users see <em>"This site isn't authorized for this app"</em>, the
             site's address is missing from this list.
           </P>
+        </Section>
+
+        <Section id="email" title="Email">
+          <P>
+            Let people sign in with their email. Beacon sends a 6-digit code and the user types it in the same sign-in window.
+            Open your app in the dashboard, go to <strong>Authentication</strong> and switch on <strong>Email</strong>. Your code
+            does not change, and any SDK version works.
+          </P>
+          <Table
+            head={["With email", ""]}
+            rows={[
+              ["Wallet", "A normal Stellar wallet (G… address), made the same way as for Google users. Every feature works."],
+              ["Users", "They appear in your Users list and monthly active users, with their email address."],
+              ["The code", "6 digits, valid for 10 minutes, works once. Five wrong tries cancel it."],
+              ["Separate from Google", "The same email signed in with Google and with a code gives two different wallets."],
+            ]}
+          />
+        </Section>
+
+        <Section id="passkeys" title="Passkeys">
+          <P>
+            Let people sign in with their fingerprint, face or screen lock instead of a Google account. Open your app in the
+            dashboard, go to <strong>Authentication</strong> and switch on <strong>Passkeys</strong>. Your code does not change, and
+            any SDK version works.
+          </P>
+          <Table
+            head={["With a passkey", ""]}
+            rows={[
+              ["Wallet", "A normal Stellar wallet (G… address), made the same way as for Google users. Every feature works."],
+              ["Users", "They appear in your Users list and monthly active users. They have no email."],
+              ["Separate from Google", "A passkey and a Google account are different sign-ins with different wallets."],
+              ["Keeping it safe", "The passkey lives on the user's device or in their password manager (iCloud, Google, 1Password). Losing every copy loses the wallet."],
+            ]}
+          />
         </Section>
 
         <Section id="networks" title="Networks">
@@ -337,6 +431,34 @@ const tx = new TransactionBuilder(account, { fee: "100", networkPassphrase: netw
 const { signedTxXdr } = await beacon.signTransaction(tx.toXDR());
 await server.submitTransaction(TransactionBuilder.fromXDR(signedTxXdr, network.passphrase));`}
           />
+          <H3>Call a smart contract</H3>
+          <P>Build, simulate and send the call with the Stellar SDK. Beacon only signs.</P>
+          <CodeBlock
+            language="ts"
+            code={`import { Contract, TransactionBuilder, nativeToScVal, rpc } from "@stellar/stellar-sdk";
+
+const network = beacon.getNetwork();
+const server = new rpc.Server("https://soroban-testnet.stellar.org"); // mainnet: your RPC provider
+const account = await server.getAccount(address);
+
+const tx = new TransactionBuilder(account, { fee: "100", networkPassphrase: network.passphrase })
+  .addOperation(new Contract("C...").call("hello", nativeToScVal("world", { type: "symbol" })))
+  .setTimeout(60)
+  .build();
+
+const prepared = await server.prepareTransaction(tx); // simulates, adds fees and footprint
+const { signedTxXdr } = await beacon.signTransaction(prepared.toXDR());
+
+const sent = await server.sendTransaction(TransactionBuilder.fromXDR(signedTxXdr, network.passphrase));
+if (sent.status === "ERROR") throw new Error("Rejected");
+
+let result = await server.getTransaction(sent.hash);
+for (let i = 0; i < 30 && result.status === "NOT_FOUND"; i++) {
+  await new Promise((r) => setTimeout(r, 1000));
+  result = await server.getTransaction(sent.hash);
+}
+// "SUCCESS" or "FAILED". Still "NOT_FOUND": the result is unknown, check again later`}
+          />
           <H3>Sign a Soroban authorization entry</H3>
           <CodeBlock
             language="ts"
@@ -345,6 +467,21 @@ await server.submitTransaction(TransactionBuilder.fromXDR(signedTxXdr, network.p
           <P>
             The wallet's confirmation screen shows what the transaction does: payments, new accounts, trusted assets,
             contract calls. It warns about operations that could change who controls an account.
+          </P>
+        </Section>
+
+        <Section id="backup" title="Back up the key">
+          <P>
+            Let users save their secret key so they can use the wallet in any Stellar app. The key is shown only inside the
+            Beacon window, after the user signs in again. Your app never receives it.
+          </P>
+          <CodeBlock
+            language="ts"
+            code={`await beacon.exportWallet(); // resolves once the user has seen their key; rejects with code -4 if they close it`}
+          />
+          <P>
+            It works for Google and passkey wallets. With an external wallet it rejects with code -6, because that wallet
+            keeps its own key. Needs <C>@beaconmcu/auth</C> 0.1.13 or newer.
           </P>
         </Section>
 
@@ -486,8 +623,102 @@ const { signedTxXdr } = await wallet.signTransaction(xdr);
             </Faq>
           </div>
         </section>
+          </>
+        )}
       </div>
     </div>
+  );
+}
+
+function ExternalWalletsTab() {
+  return (
+    <>
+      <Section id="enable" title="Turn it on">
+        <P>
+          Let people use Freighter (Varial), xBull, LOBSTR, Hana, Albedo or Rabet instead of Google. Open your app in the
+          dashboard, go to <strong>Authentication</strong> and switch on <strong>External wallets</strong>.
+        </P>
+        <CodeBlock language="bash" code={`npm install @beaconmcu/auth@latest   # 0.1.12 or newer`} />
+        <P>
+          Nothing else to install. The wallet code loads only for apps that turn this on.
+        </P>
+      </Section>
+
+      <Section id="use" title="Use it">
+        <P>
+          Your code does not change. <C>login()</C> now opens one window with Google and the wallet list.
+        </P>
+        <CodeBlock
+          language="ts"
+          code={`const { address } = await beacon.login();                // Google or a wallet
+await beacon.sendPayment({ to: "G...", amount: "10" });  // the wallet asks the user to approve
+const { signedTxXdr } = await beacon.signTransaction(xdr);
+const { signedMessage } = await beacon.signMessage("Hello");`}
+        />
+        <P>
+          Smart contract calls use <C>signTransaction</C>, the same as for Google users. See{" "}
+          <a href="/docs#signing" className="font-medium text-brand-text hover:underline">
+            Call a smart contract
+          </a>
+          .
+        </P>
+      </Section>
+
+      <Section id="differences" title="What is different">
+        <Table
+          head={["", "External wallet"]}
+          rows={[
+            ["Keys", "The user keeps their own keys. Each action is approved in their wallet."],
+            ["Works", <>login, logout, sendPayment, signTransaction, signMessage, signAuthEntry, switchNetwork.</>],
+            ["Silent signing", <><C>showWalletUI: false</C> does not apply.</>],
+            ["Users and billing", "Not in your Users list or your monthly active users."],
+            ["Page reload", "The user connects their wallet again."],
+            ["New accounts", "sendPayment to an account that does not exist yet creates it and needs at least 1 XLM."],
+            ["signMessage", "The signature format is up to the wallet."],
+          ]}
+        />
+      </Section>
+
+      <Section id="errors" title="Handle errors">
+        <CodeBlock
+          language="ts"
+          code={`import { BeaconError } from "@beaconmcu/auth";
+
+try {
+  await beacon.sendPayment({ to: "G...", amount: "10" });
+} catch (e) {
+  if (e instanceof BeaconError) {
+    if (e.code === -4) return;        // the user cancelled in their wallet: not an error
+    if (e.code === -7) return;        // another request is already waiting for the user
+    console.error(e.code, e.message);
+  }
+}`}
+        />
+      </Section>
+
+      <Section id="verify" title="Verify an address">
+        <P>
+          Beacon does not verify an external wallet's address on its servers. If you log someone in to your own backend,
+          ask them to sign a one-time text and check it there (SEP-53):
+        </P>
+        <CodeBlock
+          language="ts"
+          code={`// client
+const nonce = await fetch("/api/nonce").then((r) => r.text());
+const { signedMessage, signerAddress } = await beacon.signMessage(nonce);
+
+// server
+import { Keypair, hash } from "@stellar/stellar-sdk";
+
+const payload = Buffer.concat([Buffer.from("Stellar Signed Message:\\n"), Buffer.from(nonce)]);
+const ok = Keypair.fromPublicKey(signerAddress).verify(hash(payload), Buffer.from(signedMessage, "base64"));`}
+        />
+        <P>
+          Use a new random nonce each time and accept it once. Some wallets return the signature in another format, so test
+          with the wallets you support.
+        </P>
+      </Section>
+    </>
   );
 }
 

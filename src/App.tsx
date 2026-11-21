@@ -11,6 +11,7 @@ import { Pricing } from "./pages/Pricing";
 import { Privacy } from "./pages/Privacy";
 import { Terms } from "./pages/Terms";
 import { AppLayout } from "./pages/app/AppLayout";
+import { AuthenticationPage } from "./pages/app/AuthenticationPage";
 import { DomainsPage } from "./pages/app/DomainsPage";
 import { Overview } from "./pages/app/Overview";
 import { SettingsPage } from "./pages/app/SettingsPage";
@@ -60,6 +61,7 @@ export function App() {
                   }
                 />
                 <Route path="users" element={<UsersPage />} />
+                <Route path="authentication" element={<AuthenticationPage />} />
                 <Route path="settings" element={<SettingsPage />} />
                 <Route path="domains" element={<DomainsPage />} />
               </Route>

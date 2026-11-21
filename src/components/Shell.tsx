@@ -8,6 +8,7 @@ import { ProfileMenu } from "./ProfileMenu";
 const SECTION_LABELS: Record<string, string> = {
   playground: "Playground",
   users: "Users",
+  authentication: "Authentication",
   settings: "Settings",
   domains: "Domains",
 };
@@ -79,6 +80,7 @@ export function Shell() {
               <NavItem to={`/apps/${appSlug}`} end icon="home" label="Overview" />
               <NavItem to={`/apps/${appSlug}/playground`} icon="play" label="Playground" />
               <NavItem to={`/apps/${appSlug}/users`} icon="users" label="Users" />
+              <NavItem to={`/apps/${appSlug}/authentication`} icon="key" label="Authentication" />
               <NavItem to={`/apps/${appSlug}/settings`} icon="settings" label="Settings" />
               <NavItem to={`/apps/${appSlug}/domains`} icon="globe" label="Domains" />
             </div>

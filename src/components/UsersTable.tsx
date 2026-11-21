@@ -63,7 +63,7 @@ export function UsersTable({ clientId }: { clientId: string }) {
                       {shortAddress(user.address)}
                     </td>
                     <td className="max-w-[16rem] truncate py-2.5 pr-4" title={user.email ?? undefined}>
-                      {user.email ?? "—"}
+                      {user.email || "Passkey user"}
                     </td>
                     <td className="whitespace-nowrap py-2.5 pr-4 text-muted">{formatDate(user.first_seen)}</td>
                     <td className="whitespace-nowrap py-2.5 text-muted">{formatDate(user.last_seen)}</td>

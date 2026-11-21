@@ -11,7 +11,7 @@ export function SettingsPage() {
 
   return (
     <>
-      <PageHeader title="Settings" description="Name, network and sign-in methods for this app." />
+      <PageHeader title="Settings" description="Name and network for this app." />
       <div className="max-w-3xl space-y-6">
         <General app={app} onSaved={setApp} />
         <DeleteApp
@@ -75,29 +75,12 @@ function General({ app, onSaved }: { app: App; onSaved: (app: App) => void }) {
         </div>
       </Field>
 
-      <div className="space-y-2">
-        <p className="text-sm font-medium text-ink">Sign-in methods</p>
-        <Method label="Google" enabled />
-        <Method label="X" />
-        <Method label="Email" />
-      </div>
-
       {error && <ErrorNote>{error}</ErrorNote>}
       {state === "saved" && !dirty && <SuccessNote>Saved.</SuccessNote>}
       <Button onClick={save} disabled={!dirty || !name.trim() || state === "saving"}>
         {state === "saving" ? "Saving…" : "Save changes"}
       </Button>
     </Card>
-  );
-}
-
-function Method({ label, enabled = false }: { label: string; enabled?: boolean }) {
-  return (
-    <label className={`flex items-center gap-3 text-sm ${enabled ? "text-ink" : "text-muted"}`}>
-      <input type="checkbox" checked={enabled} disabled readOnly className="h-4 w-4 accent-[var(--brand)]" />
-      <span>{label}</span>
-      {!enabled && <span className="text-xs">Coming soon</span>}
-    </label>
   );
 }
 

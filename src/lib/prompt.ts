@@ -18,7 +18,7 @@ export function buildPrompt({ clientId, network }: { clientId: string; network: 
 npm install @beaconmcu/auth
 (Also install @stellar/stellar-sdk only if I need to build custom transactions.)
 
-## API  (package @beaconmcu/auth: ESM + CommonJS, TypeScript types included, no dependencies)
+## API  (package @beaconmcu/auth: ESM + CommonJS, TypeScript types included. Wallet code for External wallets loads only when that is turned on)
 
 import { BeaconAuth } from "@beaconmcu/auth";
 
@@ -31,7 +31,7 @@ const beacon = new BeaconAuth({
 });
 
 Methods (async unless marked sync):
-- login(): Promise<{ address }>   Opens the wallet; the user signs in with Google. address is a Stellar address (starts with G).
+- login(): Promise<{ address }>   Opens the wallet; the user signs in with Google, or with an external wallet if the app turned External wallets on (see below). address is a Stellar address (starts with G).
 - logout(): Promise<void>
 - getAddress(): string | null   (sync)
 - getNetwork(): { id: "testnet" | "mainnet", name, passphrase, horizonUrl, explorerUrl, friendbotUrl? }   (sync; friendbotUrl exists on testnet only)
@@ -40,11 +40,24 @@ Methods (async unless marked sync):
 - signMessage(message: string): Promise<{ signedMessage, signerAddress }>   signedMessage is a base64 signature (SEP-53).
 - signTransaction(xdr, { networkPassphrase?, address? }): Promise<{ signedTxXdr, signerAddress }>   Signs a transaction I built with @stellar/stellar-sdk. I submit it myself (for example with Horizon).
 - signAuthEntry(preimageBase64): Promise<{ signedAuthEntry, signerAddress }>   Soroban authorization entries.
+- exportWallet(): Promise<{ revealed: true }>   Shows the user their secret key inside the Beacon window after they sign in again, so they can back it up. The app never receives the key. Rejects with -4 if the user closes it, -6 for external wallets. Needs 0.1.13 or newer.
 - getWalletInterface(): the standard Stellar wallet shape (SEP-43) for libraries such as Stellar Wallets Kit.
 - on(event, callback): returns a function that unsubscribes. Events: "connect" ({ address, network }), "disconnect", "accountChanged" (address | null), "networkChanged" ("testnet" | "mainnet").
 - destroy()
 
 Errors are BeaconError objects with a numeric code: -1 internal, -2 network/service problem, -3 invalid request, -4 user rejected (do not retry, and do not show it as a red error), -5 not connected, -6 not supported, -7 another request is already waiting for the user.
+
+## External wallets (optional)
+If External wallets is switched on for the app (dashboard > the app > Authentication), login() shows Google and a list of Stellar wallets (Freighter/Varial, xBull, LOBSTR, Hana, Albedo, Rabet) in one window. The code does not change. Requires @beaconmcu/auth 0.1.12 or newer.
+- sendPayment, signTransaction, signMessage, signAuthEntry and switchNetwork all work; the user approves each one in their own wallet. showWalletUI: false does not apply.
+- These users are not in the Users list or monthly active users, and they must sign in again after a page reload.
+- The address is NOT verified by Beacon's servers. Do not use it to log someone in to my own backend without checking a signed message myself. The format of a signMessage signature depends on the wallet.
+
+## Email (optional)
+If Email is switched on for the app (dashboard > the app > Authentication), login() also offers an email box: the user gets a 6-digit code by email and types it in the same window. The code does not change and any SDK version works. An email user gets a normal Stellar wallet (G... address), counts as a user, and appears in the Users list with their email. The same email with Google gives a different wallet.
+
+## Passkeys (optional)
+If Passkeys is switched on for the app (dashboard > the app > Authentication), login() also offers "Continue with a passkey". The code does not change and any SDK version works. A passkey user gets a normal Stellar wallet (G... address), counts as a user, and has no email. A passkey and a Google account are separate sign-ins with separate wallets.
 
 ## Rules and gotchas
 1. Create ONE BeaconAuth instance for the whole app, in its own module. It is safe to import on the server, but call its methods only from client-side code (event handlers and effects). In Next.js, mark those components "use client".
@@ -57,6 +70,7 @@ Errors are BeaconError objects with a numeric code: -1 internal, -2 network/serv
 8. Domains: http://localhost (any port) works automatically while developing. Before launch, add the live site's address (like https://myapp.com, no path) under Domains in the Beacon dashboard. Otherwise users see "This site isn't authorized for this app".
 9. Mainnet is real money. Keep the default network on testnet while building, and label mainnet clearly in the UI.
 10. Amounts are always strings, and XLM has at most 7 decimal places.
+11. Always add a "Back up key" button for signed-in users that calls beacon.exportWallet(). It shows the user their secret key inside the Beacon window; the app never receives it. It does not work for external wallets (rejects with -6), so hide the button for those users or handle that error.
 
 ## What to deliver
 - Complete, working code for every file (not snippets). Use React with TypeScript (Vite) unless my description says otherwise.
