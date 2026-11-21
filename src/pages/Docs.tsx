@@ -164,8 +164,9 @@ export function Docs() {
             ]}
           />
           <P>
-            The same Google account gets the <strong>same wallet address in every app</strong> that uses Beacon. The
-            private key is created and used only inside the wallet window, so your app never sees it.
+            Every person gets <strong>their own wallet in each app</strong>, with its own address. One app can only ever reach the
+            money its own users put in that app's wallet, never a wallet from another app. The private key is created and used
+            only inside the wallet window, so your app never sees it.
           </P>
         </Section>
 
@@ -176,6 +177,11 @@ export function Docs() {
             line in square brackets with what you want to build, and paste it in.
           </P>
           <PromptBlock prompt={buildPrompt({ clientId: "bcn_app_YOUR_CLIENT_ID", network: "testnet" })} />
+          <P>
+            Using an agent that can open links (Claude Code, Cursor, ChatGPT with browsing)? Give it this address instead. It is
+            the same text as plain text, so the agent can read it:
+          </P>
+          <CodeBlock language="url" code="https://dash.beaconmcu.space/llms.txt" />
           <P>
             Open one of your apps in the dashboard to get the same prompt with that app's own Client ID and network already
             filled in.
@@ -612,7 +618,8 @@ const { signedTxXdr } = await wallet.signTransaction(xdr);
               No. Beacon runs the Google sign-in for every app. You only need a Client ID.
             </Faq>
             <Faq q="Is the wallet address the same across apps?">
-              Yes. One Google account has one wallet, so the same address appears in every app that uses Beacon.
+              No. A person signs in once, but each app gets a separate wallet with its own address and key. That keeps an
+              app from touching funds a person holds in another app.
             </Faq>
             <Faq q="Why does the balance show 0 or “not activated”?">
               A Stellar account must receive at least 1 XLM before it exists. Fund it with Friendbot on testnet.

@@ -5,7 +5,7 @@ import type { Network } from "./api";
 // Keep it in step with the SDK (SDK/src/BeaconAuth.ts) and the docs.
 
 export function buildPrompt({ clientId, network }: { clientId: string; network: Network }): string {
-  return `You are helping me build a web app that uses Beacon, an embedded Stellar wallet with Google sign-in. Users click "Log in", sign in with Google and instantly get a Stellar wallet. No browser extension and no seed phrase. The private key lives only inside Beacon's wallet window (an iframe), so my app never sees it.
+  return `You are helping me build a web app that uses Beacon, an embedded Stellar wallet with Google sign-in (and, if the app turns them on, email codes, passkeys or external wallets). Users click "Log in", sign in and instantly get a Stellar wallet. No browser extension and no seed phrase. The private key lives only inside Beacon's wallet window (an iframe), so my app never sees it.
 
 ## What I want to build
 [DESCRIBE YOUR APP HERE. For example: "a tipping page where visitors log in and send XLM to the creator".]
@@ -52,6 +52,9 @@ If External wallets is switched on for the app (dashboard > the app > Authentica
 - sendPayment, signTransaction, signMessage, signAuthEntry and switchNetwork all work; the user approves each one in their own wallet. showWalletUI: false does not apply.
 - These users are not in the Users list or monthly active users, and they must sign in again after a page reload.
 - The address is NOT verified by Beacon's servers. Do not use it to log someone in to my own backend without checking a signed message myself. The format of a signMessage signature depends on the wallet.
+
+## Wallets are per app
+Every person gets their own wallet in each app: the same person has a different Stellar address (and key) in each app, and no app can reach a wallet that belongs to another app. A new wallet starts empty and not activated, so the user has to fund it before it can send.
 
 ## Email (optional)
 If Email is switched on for the app (dashboard > the app > Authentication), login() also offers an email box: the user gets a 6-digit code by email and types it in the same window. The code does not change and any SDK version works. An email user gets a normal Stellar wallet (G... address), counts as a user, and appears in the Users list with their email. The same email with Google gives a different wallet.

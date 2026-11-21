@@ -102,7 +102,7 @@ function DeleteApp({ app, onDeleted }: { app: App; onDeleted: () => void }) {
   };
 
   return (
-    <Card title="Delete app" tone="danger" subtitle="Your code will stop working with this Client ID. Users' wallets are not deleted.">
+    <Card title="Delete app" tone="danger" subtitle="Your code will stop working with this Client ID. Your users can no longer open their wallets for this app, so make sure they have moved or backed up anything in them first.">
       <Button variant="danger" onClick={() => setOpen(true)}>
         Delete app
       </Button>

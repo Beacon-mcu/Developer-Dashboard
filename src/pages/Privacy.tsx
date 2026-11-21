@@ -60,7 +60,7 @@ export function Privacy() {
 
       <Section title="Why we use it">
         <ul className="list-disc space-y-1 pl-5">
-          <li>To sign you in and give you the same wallet every time and in every app.</li>
+          <li>To sign you in and give you the same wallet every time you return to an app.</li>
           <li>To show developers how many people use their apps, and which addresses they are.</li>
           <li>To keep the service secure and working.</li>
         </ul>

@@ -14,7 +14,7 @@ const { address } = await beacon.login();
 
 const POINTS = [
   { title: "No seed phrases", body: "Users sign in with Google. Their wallet is created for them." },
-  { title: "One wallet everywhere", body: "The same Google account has the same address in every app." },
+  { title: "A wallet per app", body: "Each app gets its own wallet, so one app never touches your funds in another." },
   { title: "Testnet and mainnet", body: "Build with free test XLM, then switch to mainnet when you launch." },
 ];
 
