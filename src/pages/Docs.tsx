@@ -597,7 +597,7 @@ const { signedTxXdr } = await wallet.signTransaction(xdr);
             </li>
             <li>
               <strong>The server stores only an encrypted copy of the key.</strong> The unlocked key lives in memory only.
-              The one-hour sign-in session is kept in the wallet's own tab storage so a page refresh keeps the user
+              The sign-in session (one hour, two hours for email) is kept in the wallet's own tab storage so a page refresh keeps the user
               signed in, and it is cleared on logout.
             </li>
             <li>
@@ -625,8 +625,8 @@ const { signedTxXdr } = await wallet.signTransaction(xdr);
               A Stellar account must receive at least 1 XLM before it exists. Fund it with Friendbot on testnet.
             </Faq>
             <Faq q="Does a page refresh log the user out?">
-              No. The wallet keeps the one-hour session for that browser tab, so a refresh signs the user back in
-              silently. After an hour, or after logout, they sign in with Google again.
+              No. The wallet keeps the session (one hour, or two hours for email sign-in) for that browser tab, so a refresh signs the user back in
+              silently. After that time, or after logout, they sign in again.
             </Faq>
           </div>
         </section>

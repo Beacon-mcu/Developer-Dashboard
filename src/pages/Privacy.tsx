@@ -84,7 +84,7 @@ export function Privacy() {
 
       <Section title="Storage in your browser">
         <p>
-          After you sign in, a short-lived sign-in token (about an hour) is kept in your browser so you do not have to
+          After you sign in, a short-lived sign-in token (one to two hours) is kept in your browser so you do not have to
           sign in again on every page. The wallet keeps it in the tab's session storage, which is cleared when you close
           the tab. The dashboard also remembers your light or dark theme choice. We do not use these for tracking.
         </p>
