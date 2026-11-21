@@ -131,7 +131,7 @@ export function Login() {
             Give every user a Stellar wallet that works behind Google sign-in. No extension, no seed phrase.
           </p>
 
-          <pre className="mt-8 overflow-x-auto rounded-2xl bg-code p-5 text-sm leading-relaxed text-slate-100">
+          <pre className="mt-8 overflow-x-auto rounded-2xl border border-code-line bg-code p-5 text-sm leading-relaxed text-code-ink">
             <code>{SAMPLE}</code>
           </pre>
 

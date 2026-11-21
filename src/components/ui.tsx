@@ -143,12 +143,12 @@ export function CopyButton({ text, label = "Copy" }: { text: string; label?: str
   );
 }
 
-// A code sample with a copy button. Always dark, in both themes.
+// A code sample with a copy button. It follows the theme.
 export function CodeBlock({ code, language }: { code: string; language?: string }) {
   return (
-    <div className="relative min-w-0 max-w-full rounded-lg bg-code text-slate-100">
+    <div className="relative min-w-0 max-w-full rounded-lg border border-code-line bg-code text-code-ink">
       <div className="absolute right-2 top-2 flex items-center gap-2">
-        {language && <span className="text-xs text-slate-500">{language}</span>}
+        {language && <span className="text-xs text-code-muted">{language}</span>}
         <CopyButton text={code} label="" />
       </div>
       <pre className="overflow-x-auto p-4 pr-16 font-mono text-xs leading-relaxed sm:pr-24">

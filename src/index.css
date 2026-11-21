@@ -37,7 +37,14 @@
   --warn-line: #fedf89;
   --warn-text: #b54708;
 
-  --code: #0b1020; /* code blocks stay dark in both themes */
+  --code: #f5f6fa; /* code blocks and the live log: light in the light theme, dark in the dark theme */
+  --code-ink: #1d2939;
+  --code-muted: #667085;
+  --code-line: #e4e7ec;
+  --log-event: #0369a1;
+  --log-call: #475467;
+  --log-ok: #067647;
+  --log-error: #b42318;
 }
 
 [data-theme="dark"] {
@@ -74,6 +81,13 @@
   --warn-text: #fec84b;
 
   --code: #05070d;
+  --code-ink: #e2e8f0;
+  --code-muted: #64748b;
+  --code-line: #1c2438;
+  --log-event: #7dd3fc;
+  --log-call: #cbd5e1;
+  --log-ok: #6ee7b7;
+  --log-error: #fca5a5;
 }
 
 @theme inline {
@@ -102,6 +116,13 @@
   --color-warn-line: var(--warn-line);
   --color-warn-text: var(--warn-text);
   --color-code: var(--code);
+  --color-code-ink: var(--code-ink);
+  --color-code-muted: var(--code-muted);
+  --color-code-line: var(--code-line);
+  --color-log-event: var(--log-event);
+  --color-log-call: var(--log-call);
+  --color-log-ok: var(--log-ok);
+  --color-log-error: var(--log-error);
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
 }
