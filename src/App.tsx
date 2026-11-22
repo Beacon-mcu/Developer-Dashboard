@@ -5,7 +5,6 @@ import { RequireAuth } from "./components/RequireAuth";
 import { Shell } from "./components/Shell";
 import { ThemeProvider } from "./lib/theme";
 import { Apps } from "./pages/Apps";
-import { Docs } from "./pages/Docs";
 import { Login } from "./pages/Login";
 import { Pricing } from "./pages/Pricing";
 import { Privacy } from "./pages/Privacy";
@@ -19,6 +18,7 @@ import { UsersPage } from "./pages/app/UsersPage";
 import { Skeleton } from "./components/ui";
 
 const Playground = lazy(() => import("./pages/app/Playground"));
+const DocsApp = lazy(() => import("./docs/DocsApp"));
 
 export function App() {
   return (
@@ -27,10 +27,17 @@ export function App() {
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Login />} />
+            <Route
+              path="/docs/*"
+              element={
+                <Suspense fallback={<div className="min-h-dvh bg-surface" />}>
+                  <DocsApp />
+                </Suspense>
+              }
+            />
 
             <Route element={<Shell />}>
               <Route path="/" element={<Navigate to="/apps" replace />} />
-              <Route path="/docs" element={<Docs />} />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/billing" element={<Navigate to="/pricing" replace />} />
               <Route path="/privacy" element={<Privacy />} />
