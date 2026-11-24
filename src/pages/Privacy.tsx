@@ -48,13 +48,17 @@ export function Privacy() {
       <Section title="Your wallet key">
         <p>
           Your wallet's private key is created inside your browser. It is encrypted there before it leaves your device,
-          so what we store is only the encrypted copy and your public address. The key is decrypted again in your browser
+          so what we store is the encrypted copy and your public address. The key is decrypted again in your browser
           when you sign in. The developer's app never sees it, and we never log it.
         </p>
         <p>
-          The encryption depends on a secret kept on Beacon's servers, so the service is trusted to protect it. Beacon is
-          early software and has not had an independent security audit. There is no recovery option: if you lose access
-          to your Google account, you lose access to the wallet. Do not keep more in it than you can afford to lose.
+          The encryption lock has two parts. One part is made by Beacon's servers each time you sign in, from a master key
+          held in AWS Key Management Service. For wallets created recently, the other part is a secret that stays in your
+          browser and is never sent to us, so Beacon alone cannot unlock them. Such a wallet opens only in the browser that
+          created it: if you clear that browser's data or use another device, only the secret key you saved with "Back up key"
+          gets you back in. Older wallets are locked by Beacon's servers alone, so for those you rely on us to protect the
+          lock, and anyone who took control of our servers could unlock them. Beacon is early software and has not had an
+          independent security audit. Do not keep more in a wallet than you can afford to lose.
         </p>
       </Section>
 
@@ -92,10 +96,16 @@ export function Privacy() {
 
       <Section title="Who runs it for us">
         <p>
-          Beacon runs on <strong>Cloudflare</strong> (the servers and database) and <strong>Vercel</strong> (this
-          dashboard's website). Sign-in is provided by <strong>Google</strong>. These providers handle data on our behalf
-          under their own privacy terms.
+          These providers handle data on our behalf, under their own privacy terms:
         </p>
+        <ul className="list-disc space-y-1 pl-5">
+          <li><strong>Cloudflare</strong>: the servers and the database. They store the data described above, including the encrypted wallet key.</li>
+          <li><strong>Amazon Web Services (AWS Key Management Service), Europe (Stockholm) region</strong>: holds the master key that Beacon uses to make the lock for wallet keys. Beacon sends it an identifier made from the app and your user ID, and receives the lock back. It never receives your wallet key, email address or any wallet data.</li>
+          <li><strong>Vercel</strong>: this dashboard's website.</li>
+          <li><strong>Google</strong>: sign-in with a Google account.</li>
+          <li><strong>Resend</strong>: sends the sign-in codes to the email address you enter, when an app offers email sign-in.</li>
+          <li><strong>Bachs</strong>: processes developers' card payments. Beacon does not see card numbers.</li>
+        </ul>
       </Section>
 
       <Section title="How long we keep it">

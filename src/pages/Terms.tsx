@@ -94,7 +94,7 @@ export function Terms() {
       <Section title="No promises, and limits on our responsibility">
         <p>
           Beacon is provided "as is" and "as available". We do not promise that it will always work, be secure or be free
-          of mistakes. Networks and third parties we depend on, such as Stellar, Google, Cloudflare and Vercel, can fail
+          of mistakes. Networks and third parties we depend on, such as Stellar, Google, Cloudflare, Amazon Web Services (which holds the key service for wallets), Vercel, Resend and Bachs, can fail
           or change.
         </p>
         <p>

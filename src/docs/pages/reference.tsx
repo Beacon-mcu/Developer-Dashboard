@@ -112,7 +112,19 @@ export function SecurityPage() {
             <strong>One wallet per person per app.</strong> An app can only reach the wallet made for it, never one from another app.
           </li>
           <li>
-            <strong>The server stores only an encrypted copy of the key.</strong> The unlocked key lives in memory only.
+            <strong>The server stores an encrypted copy of the key.</strong> The unlocked key lives in the wallet window's memory only.
+          </li>
+          <li>
+            <strong>New wallets have a two-part lock.</strong> One part comes from Beacon's backend (a master key held in AWS Key
+            Management Service). The other is a secret that stays in the user's browser and is never sent to Beacon, so the backend
+            alone cannot unlock the wallet. The wallet then opens only in the browser that created it. If the user clears that
+            browser's data or switches device, only the secret key saved with <C>exportWallet()</C> gets them back in, so
+            tell your users to use your Back up key button.
+          </li>
+          <li>
+            <strong>Older wallets are still custodial.</strong> Wallets made before the two-part lock are locked by Beacon's backend
+            alone, so someone who took control of it could unlock them. Beacon has not had an independent security audit. Do not
+            describe Beacon wallets as non-custodial to your own users.
           </li>
         </ul>
       </Section>

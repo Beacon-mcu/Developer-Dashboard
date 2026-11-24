@@ -41,7 +41,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "Do you ever see my users' private keys?",
-    a: "No. A wallet's key is encrypted in the user's browser, and your app never sees it. See the docs for how Beacon handles keys.",
+    a: "Your app never sees them. A wallet's key is created in the user's browser and stored encrypted, but the lock comes from Beacon's servers at sign-in, so Beacon is not fully non-custodial: someone who took control of our servers could unlock wallets. See Security in the docs.",
   },
 ];
 
