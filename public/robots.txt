@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /apps
+Disallow: /billing
+
+Sitemap: https://dash.beaconmcu.space/sitemap.xml
