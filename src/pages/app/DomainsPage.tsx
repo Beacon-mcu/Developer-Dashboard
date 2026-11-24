@@ -1,5 +1,4 @@
-import { useCallback, useState } from "react";
-import { ReauthModal } from "../../components/ReauthModal";
+import { useState } from "react";
 import { OriginsEditor } from "../../components/OriginsEditor";
 import { Button, Card, ErrorNote, PageHeader, SuccessNote } from "../../components/ui";
 import { api } from "../../lib/api";
@@ -10,16 +9,14 @@ export function DomainsPage() {
   const [origins, setOrigins] = useState<string[]>(app.allowed_origins);
   const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
   const [error, setError] = useState<string | null>(null);
-  const [confirming, setConfirming] = useState(false); // asking for a fresh Google sign-in before saving
 
   const dirty = origins.join("\n") !== app.allowed_origins.join("\n");
 
-  const save = async (reauth: string) => {
-    setConfirming(false);
+  const save = async () => {
     setState("saving");
     setError(null);
     try {
-      setApp(await api.updateApp(app.client_id, { allowed_origins: origins, reauth }));
+      setApp(await api.updateApp(app.client_id, { allowed_origins: origins }));
       setState("saved");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save.");
@@ -27,11 +24,8 @@ export function DomainsPage() {
     }
   };
 
-  const onCredential = useCallback((credential: string) => void save(credential), [origins]); // eslint-disable-line react-hooks/exhaustive-deps
-
   return (
     <>
-      {confirming && <ReauthModal onCredential={onCredential} onClose={() => setConfirming(false)} />}
       <PageHeader
         title="Domains"
         description="The websites allowed to open the Beacon wallet for this app."
@@ -55,7 +49,7 @@ export function DomainsPage() {
           />
           {error && <ErrorNote>{error}</ErrorNote>}
           {state === "saved" && !dirty && <SuccessNote>Saved.</SuccessNote>}
-          <Button onClick={() => setConfirming(true)} disabled={!dirty || state === "saving"}>
+          <Button onClick={save} disabled={!dirty || state === "saving"}>
             {state === "saving" ? "Saving…" : "Save domains"}
           </Button>
         </Card>
