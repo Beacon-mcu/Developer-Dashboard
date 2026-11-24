@@ -11,7 +11,7 @@ export function DomainsPage() {
               <>
                 <C>http://localhost:3000</C>, <C>127.0.0.1</C> (any port)
               </>,
-              "Nothing. Local development always works.",
+              "Nothing for testnet. For mainnet, add that exact address (for example http://localhost:3000) under Domains.",
             ],
             [
               <C key="a">https://myapp.com</C>,
@@ -41,7 +41,7 @@ export function ReferencePage() {
             [<C key="2">defaultNetwork</C>, "the dashboard's network", <>"testnet" or "mainnet", used on login.</>],
             [<C key="3">supportedNetworks</C>, "just the default", <>Networks <C>switchNetwork</C> may use.</>],
             [<C key="4">showWalletUI</C>, "true", "false signs low-risk requests without a prompt."],
-            [<C key="5">walletUrl</C>, "built in", "Only to test a different wallet."],
+            [<C key="5">walletUrl</C>, "built in", "Only to test a different wallet. Must be https (http only for localhost)."],
           ]}
         />
       </Section>
@@ -50,7 +50,7 @@ export function ReferencePage() {
         <Table
           head={["Method", "Returns"]}
           rows={[
-            [<C key="1">login()</C>, <><C>{"{ address }"}</C>. Opens the wallet and signs the user in.</>],
+            [<C key="1">login()</C>, <><C>{"{ address, network, provider }"}</C>. Opens the wallet and signs the user in. <C>network</C> is the one the wallet is on. <C>provider</C> is <C>"beacon"</C> or <C>"external"</C>. The address is not proof of who someone is: see Verify an address.</>],
             [<C key="2">logout()</C>, "Signs the user out."],
             [<C key="3">switchNetwork(network)</C>, "Switches to another supported network."],
             [<C key="4">sendPayment({"{ to, amount, memo? }"})</C>, <><C>{"{ hash }"}</C>. Builds, signs and submits an XLM payment.</>],
@@ -92,6 +92,8 @@ export function ReferencePage() {
             [<C key="5">-5</C>, "Not connected. Call login() first."],
             [<C key="6">-6</C>, "Not supported, for example a network you did not list."],
             [<C key="7">-7</C>, "Another request is already waiting for the user."],
+            [<C key="8">-8</C>, "A payment was sent but the result is not known. Look up error.hash before sending it again."],
+            [<C key="9">-9</C>, "The wallet did not answer in time. The request was cancelled."],
           ]}
         />
       </Section>
@@ -135,7 +137,7 @@ export function SecurityPage() {
             <strong>Your site and the wallet talk only through messages</strong>, and both sides check who sent them.
           </li>
           <li>
-            <strong>Only your allowed domains can open the wallet</strong> for your app, plus localhost for development.
+            <strong>Only your allowed domains can open the wallet</strong> for your app, plus localhost for development (testnet only, unless you list it).
           </li>
           <li>
             <strong>The sign-in session</strong> (one hour, two hours for email) is kept in the wallet's own tab storage so a refresh
@@ -160,7 +162,7 @@ export function FaqPage() {
     <DocPage title="FAQ">
       <div className="space-y-4">
         <Faq q="Users see “This site isn't authorized for this app”.">
-          The site's address is not in your app's Domains list. Add it in the dashboard. Localhost never needs adding.
+          The site's address is not in your app's Domains list. Add it in the dashboard. Localhost works on testnet without adding it; list it only to use mainnet from your own machine.
         </Faq>
         <Faq q="Do I have to set up Google credentials?">No. Beacon runs the Google sign-in for every app. You only need a Client ID.</Faq>
         <Faq q="Is the wallet address the same across apps?">

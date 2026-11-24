@@ -31,7 +31,7 @@ const beacon = new BeaconAuth({
 });
 
 Methods (async unless marked sync):
-- login(): Promise<{ address }>   Opens the wallet; the user signs in with Google, or with an external wallet if the app turned External wallets on (see below). address is a Stellar address (starts with G).
+- login(): Promise<{ address, network, provider }>   Opens the wallet; the user signs in with Google, or with an external wallet if the app turned External wallets on (see below). address is a Stellar address (starts with G).
 - logout(): Promise<void>
 - getAddress(): string | null   (sync)
 - getNetwork(): { id: "testnet" | "mainnet", name, passphrase, horizonUrl, explorerUrl, friendbotUrl? }   (sync; friendbotUrl exists on testnet only)
@@ -69,9 +69,9 @@ If Passkeys is switched on for the app (dashboard > the app > Authentication), l
 3. A Stellar account only exists after it receives at least 1 XLM, so a brand-new wallet is "not activated" until funded. On testnet, fund it with Friendbot: await fetch(\`\${beacon.getNetwork().friendbotUrl}?addr=\${address}\`). On mainnet the user must receive at least 1 XLM first.
 4. An account must keep a 1 XLM reserve, so it cannot send its whole balance. Sending to an account that does not exist yet creates it and needs at least 1 XLM.
 5. Read balances from Horizon yourself: GET {horizonUrl}/accounts/{address}. The XLM balance is the entry in balances[] where asset_type === "native". A 404 means the account is not activated yet.
-6. Call getNetwork() after login(). Before login it can only report the default, not the network the wallet is on.
+6. Use the network that login() returns (or call getNetwork() after login()). Before login it can only report the default, not the network the wallet is on. Never pass a networkPassphrase for a different network: the SDK refuses it (code -3). Needs 0.1.15 or newer.
 7. Show clear loading, success and error states. When error.code === -4 the user simply declined: show a neutral message.
-8. Domains: http://localhost (any port) works automatically while developing. Before launch, add the live site's address (like https://myapp.com, no path) under Domains in the Beacon dashboard. Otherwise users see "This site isn't authorized for this app".
+8. Domains: http://localhost (any port) works automatically while developing, on testnet only (to use mainnet from localhost, list that exact address under Domains). Before launch, add the live site's address (like https://myapp.com, no path) under Domains in the Beacon dashboard. Otherwise users see "This site isn't authorized for this app".
 9. Mainnet is real money. Keep the default network on testnet while building, and label mainnet clearly in the UI.
 10. Amounts are always strings, and XLM has at most 7 decimal places.
 11. Always add a "Back up key" button for signed-in users that calls beacon.exportWallet(). It shows the user their secret key inside the Beacon window; the app never receives it. It does not work for external wallets (rejects with -6), so hide the button for those users or handle that error.

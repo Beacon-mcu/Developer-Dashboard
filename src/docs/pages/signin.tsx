@@ -45,26 +45,39 @@ const VERIFY_SERVER = `import express from "express";
 import { randomBytes } from "node:crypto";
 import { Keypair, hash } from "@stellar/stellar-sdk";
 
+const DOMAIN = "myapp.com"; // your site: the signature is only good for it
 const app = express();
 app.use(express.json());
 
-const nonces = new Set<string>();
+// nonce -> the address it was issued to, and when it stops working. Use your database or Redis in production.
+const challenges = new Map<string, { address: string; expires: number }>();
 
-app.get("/api/nonce", (_req, res) => {
+// 1. The app asks for a challenge for the address that just signed in. The nonce belongs to that address.
+app.post("/api/challenge", (req, res) => {
+  const address = String(req.body.address);
   const nonce = randomBytes(16).toString("hex");
-  nonces.add(nonce);
-  setTimeout(() => nonces.delete(nonce), 5 * 60_000);
-  res.json({ nonce });
+  const expires = Date.now() + 5 * 60_000;
+  challenges.set(nonce, { address, expires });
+  res.json({ message: messageFor({ address, nonce, expires }) });
 });
 
+// What the person signs. It names your site, the address, a one-time nonce and an expiry, so it cannot be reused anywhere else.
+function messageFor({ address, nonce, expires }: { address: string; nonce: string; expires: number }) {
+  return \`\${DOMAIN} wants you to sign in with \${address}.\\nNonce: \${nonce}\\nExpires: \${new Date(expires).toISOString()}\`;
+}
+
+// 2. The app sends the signature back. The server rebuilds the message itself and checks it.
 app.post("/api/verify", (req, res) => {
   const { nonce, address, signedMessage } = req.body;
-  if (!nonces.delete(nonce)) return res.status(400).json({ ok: false });
+  const challenge = challenges.get(nonce);
+  challenges.delete(nonce); // one use only
+  if (!challenge || challenge.address !== address || challenge.expires < Date.now()) return res.status(400).json({ ok: false });
 
-  const payload = Buffer.concat([Buffer.from("Stellar Signed Message:\\n"), Buffer.from(nonce)]);
+  const message = messageFor({ address, nonce, expires: challenge.expires });
+  const payload = Buffer.concat([Buffer.from("Stellar Signed Message:\\n"), Buffer.from(message)]);
   try {
     const ok = Keypair.fromPublicKey(address).verify(hash(payload), Buffer.from(signedMessage, "base64"));
-    res.json({ ok });
+    res.json({ ok }); // if ok, start your own session for this address
   } catch {
     res.json({ ok: false });
   }
@@ -74,9 +87,15 @@ app.listen(3001);`;
 
 const VERIFY_CLIENT = `import { beacon } from "./lib/beacon";
 
-export async function proveAddress(): Promise<boolean> {
-  const { nonce } = await fetch("/api/nonce").then((r) => r.json());
-  const { signedMessage, signerAddress } = await beacon.signMessage(nonce);
+export async function proveAddress(address: string): Promise<boolean> {
+  const { message } = await fetch("/api/challenge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ address }),
+  }).then((r) => r.json());
+
+  const { signedMessage, signerAddress } = await beacon.signMessage(message);
+  const nonce = /Nonce: (\\w+)/.exec(message)?.[1];
 
   const res = await fetch("/api/verify", {
     method: "POST",
@@ -187,11 +206,16 @@ export function ExternalWalletsPage() {
 
       <Section id="verify" title="Verify an address">
         <P>
-          Beacon does not verify an external wallet's address on its servers. To log someone in to your own backend, have them sign a
-          one-time text and check it there (SEP-53). Each nonce works once.
+          <C>login()</C> only gives your page an address. It is not proof: your backend cannot trust it. <C>provider</C> tells you
+          where it came from (<C>"beacon"</C> or <C>"external"</C>), but either way, to log someone in to your own backend, have them
+          sign a challenge from your server and check it there (SEP-53).
         </P>
-        <FileCode name="server.ts" code={VERIFY_SERVER} note="Issues a one-time nonce and checks the signed message against the address." />
-        <FileCode name="src/verify.ts" code={VERIFY_CLIENT} note="Asks the server for a nonce, has the wallet sign it, and sends the result back." />
+        <P>
+          The challenge must name your site, the address it was issued to, a one-time nonce and an expiry. Without those, a signature
+          could be reused on another site, for another address, or later.
+        </P>
+        <FileCode name="server.ts" code={VERIFY_SERVER} note="Issues a challenge for one address, then rebuilds it and checks the signature. Each nonce works once." />
+        <FileCode name="src/verify.ts" code={VERIFY_CLIENT} note="Asks the server for the challenge, has the wallet sign it, and sends the result back." />
         <P>Test with the wallets you support, as signature formats can differ.</P>
       </Section>
     </DocPage>

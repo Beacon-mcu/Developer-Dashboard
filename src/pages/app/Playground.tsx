@@ -22,7 +22,10 @@ const AMOUNT = /^\d+(\.\d{1,7})?$/;
 // exactly the way a developer's own app would build it, and the right-hand log shows what it does.
 export default function Playground() {
   const { app } = useApp();
-  const [silent, setSilent] = useState(false);
+  const [silentChoice, setSilent] = useState(false);
+  // Signing without the confirmation screen is for testnet only: on a mainnet app it is not offered at all.
+  const silentAllowed = app.network === "testnet";
+  const silent = silentChoice && silentAllowed;
   const { beacon, address, network, logs, clearLogs, log, call } = usePlayground(app.client_id, app.network, silent);
   const net = NETWORKS[network];
 
@@ -68,6 +71,7 @@ export default function Playground() {
             balanceFailed={balanceFailed}
             ready={!!beacon}
             silent={silent}
+            silentAllowed={silentAllowed}
             onSilent={setSilent}
             onRefresh={refresh}
             onLogin={() => call("beacon.login()", (b) => b.login())}
@@ -111,6 +115,7 @@ function Connection(props: {
   balanceFailed: boolean;
   ready: boolean;
   silent: boolean;
+  silentAllowed: boolean;
   appSlug: string;
   onSilent: (value: boolean) => void;
   onRefresh: () => void;
@@ -236,6 +241,7 @@ function Connection(props: {
             <input
               type="checkbox"
               checked={props.silent}
+              disabled={!props.silentAllowed}
               onChange={(e) => props.onSilent(e.target.checked)}
               className="mt-0.5 h-4 w-4 accent-[var(--brand)]"
             />
@@ -243,7 +249,10 @@ function Connection(props: {
               <span className="font-medium text-ink">Skip the confirmation screen for low-risk requests</span>
               <span className="mt-0.5 block text-muted">
                 <code className="font-mono">showWalletUI: false</code>. Plain messages and XLM payments are signed without a
-                prompt. Anything risky still asks.
+                prompt. Anything risky still asks.{" "}
+                {props.silentAllowed
+                  ? "Testnet only: switching to mainnet is turned off while this is on."
+                  : "Not available for a mainnet app."}
               </span>
             </span>
           </label>

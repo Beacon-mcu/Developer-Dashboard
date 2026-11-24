@@ -1,0 +1,6 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-mG6xbXTMk7xBXrzYhfseMPmg0+KnvqTfF63F6jgCmtA=' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://api.beaconmcu.space https://accounts.google.com https://horizon.stellar.org https://horizon-testnet.stellar.org https://friendbot.stellar.org; frame-src https://accounts.google.com https://wallet.beaconmcu.space; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains

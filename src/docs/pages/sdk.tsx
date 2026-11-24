@@ -122,7 +122,7 @@ function Next() {
           <Link to="/docs/domains" className="text-brand-text hover:underline">
             Add your live site before you launch
           </Link>{" "}
-          (<C>localhost</C> works as is)
+          (<C>localhost</C> works as is, on testnet)
         </li>
       </ul>
     </Section>

@@ -117,7 +117,7 @@ export const api = {
 
   updateApp: (
     clientId: string,
-    changes: Partial<Pick<App, "name" | "allowed_origins" | "network" | "auth_methods">>,
+    changes: Partial<Pick<App, "name" | "allowed_origins" | "network" | "auth_methods">> & { reauth?: string }, // reauth: a fresh Google sign-in, needed to change domains
   ) =>
     request<{ app: App }>(`/dev/apps/${encodeURIComponent(clientId)}`, { method: "PATCH", body: changes }).then(
       (r) => r.app,

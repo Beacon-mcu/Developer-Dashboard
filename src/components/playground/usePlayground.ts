@@ -37,7 +37,7 @@ export function usePlayground(clientId: string, defaultNetwork: NetworkId, silen
       clientId,
       walletUrl: WALLET_URL,
       defaultNetwork,
-      supportedNetworks: ["testnet", "mainnet"],
+      supportedNetworks: silent ? ["testnet"] : ["testnet", "mainnet"], // no silent signing anywhere near real funds
       showWalletUI: !silent,
     });
     log("event", `new BeaconAuth({ defaultNetwork: "${defaultNetwork}", showWalletUI: ${!silent} })  wallet: ${WALLET_ADDRESS}`);

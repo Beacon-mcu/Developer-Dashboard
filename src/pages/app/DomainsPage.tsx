@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { ReauthModal } from "../../components/ReauthModal";
 import { OriginsEditor } from "../../components/OriginsEditor";
 import { Button, Card, ErrorNote, PageHeader, SuccessNote } from "../../components/ui";
 import { api } from "../../lib/api";
@@ -9,14 +10,16 @@ export function DomainsPage() {
   const [origins, setOrigins] = useState<string[]>(app.allowed_origins);
   const [state, setState] = useState<"idle" | "saving" | "saved">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState(false); // asking for a fresh Google sign-in before saving
 
   const dirty = origins.join("\n") !== app.allowed_origins.join("\n");
 
-  const save = async () => {
+  const save = async (reauth: string) => {
+    setConfirming(false);
     setState("saving");
     setError(null);
     try {
-      setApp(await api.updateApp(app.client_id, { allowed_origins: origins }));
+      setApp(await api.updateApp(app.client_id, { allowed_origins: origins, reauth }));
       setState("saved");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not save.");
@@ -24,8 +27,11 @@ export function DomainsPage() {
     }
   };
 
+  const onCredential = useCallback((credential: string) => void save(credential), [origins]); // eslint-disable-line react-hooks/exhaustive-deps
+
   return (
     <>
+      {confirming && <ReauthModal onCredential={onCredential} onClose={() => setConfirming(false)} />}
       <PageHeader
         title="Domains"
         description="The websites allowed to open the Beacon wallet for this app."
@@ -36,7 +42,7 @@ export function DomainsPage() {
           subtitle={
             <>
               Add your live site's address before you launch, for example <code className="font-mono">https://myapp.com</code>.
-              Local development (<code className="font-mono">localhost</code>) works automatically, with nothing to add.
+              Local development (<code className="font-mono">localhost</code>) works automatically on testnet, with nothing to add. To use mainnet from your own machine, add that exact address (for example http://localhost:3000).
             </>
           }
         >
@@ -49,7 +55,7 @@ export function DomainsPage() {
           />
           {error && <ErrorNote>{error}</ErrorNote>}
           {state === "saved" && !dirty && <SuccessNote>Saved.</SuccessNote>}
-          <Button onClick={save} disabled={!dirty || state === "saving"}>
+          <Button onClick={() => setConfirming(true)} disabled={!dirty || state === "saving"}>
             {state === "saving" ? "Saving…" : "Save domains"}
           </Button>
         </Card>

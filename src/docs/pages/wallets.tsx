@@ -44,28 +44,38 @@ await server.submitTransaction(TransactionBuilder.fromXDR(signedTxXdr, network.p
         </P>
         <FileCode
           name=".env"
-          code={`VITE_SOROBAN_RPC_URL=https://soroban-testnet.stellar.org`}
-          note="The RPC address for the network your app uses. Testnet has a free public one. On mainnet, use your own provider's address."
+          code={`VITE_SOROBAN_RPC_URL_TESTNET=https://soroban-testnet.stellar.org
+VITE_SOROBAN_RPC_URL_MAINNET=your provider's address`}
+          note="One RPC address per network. Testnet has a free public one. On mainnet, use your own provider's address."
         />
         <FileCode
           name="example.ts"
           note="Builds the call, has the user sign it in Beacon, then sends it and waits for the result."
           code={`import { Contract, TransactionBuilder, nativeToScVal, rpc } from "@stellar/stellar-sdk";
 
+const rpcUrls = {
+  testnet: import.meta.env.VITE_SOROBAN_RPC_URL_TESTNET,
+  mainnet: import.meta.env.VITE_SOROBAN_RPC_URL_MAINNET,
+};
 const network = beacon.getNetwork();
-const server = new rpc.Server(import.meta.env.VITE_SOROBAN_RPC_URL);
+const server = new rpc.Server(rpcUrls[network.id]);
 const account = await server.getAccount(address);
 
 const tx = new TransactionBuilder(account, { fee: "100", networkPassphrase: network.passphrase })
   .addOperation(new Contract("C...").call("hello", nativeToScVal("world", { type: "symbol" })))
-  .setTimeout(60)
+  .setTimeout(300) // longer than the 60 s the wallet waits for approval
   .build();
 
-const prepared = await server.prepareTransaction(tx);
+const sim = await server.simulateTransaction(tx);
+if (rpc.Api.isSimulationRestore(sim)) {
+  throw new Error("The contract data has expired: restore it first, then try again");
+}
+const prepared = rpc.assembleTransaction(tx, sim).build();
 const { signedTxXdr } = await beacon.signTransaction(prepared.toXDR());
 
 const sent = await server.sendTransaction(TransactionBuilder.fromXDR(signedTxXdr, network.passphrase));
 if (sent.status === "ERROR") throw new Error("Rejected");
+// TRY_AGAIN_LATER: busy, send the same signed transaction again. DUPLICATE: already received.
 
 let result = await server.getTransaction(sent.hash);
 for (let i = 0; i < 30 && result.status === "NOT_FOUND"; i++) {
@@ -74,13 +84,42 @@ for (let i = 0; i < 30 && result.status === "NOT_FOUND"; i++) {
 }`}
         />
         <P>
-          <C>result.status</C> ends as <C>SUCCESS</C> or <C>FAILED</C>. Still <C>NOT_FOUND</C> means the result is unknown, so check
-          again later.
+          <C>sendTransaction</C> answers <C>PENDING</C>, <C>DUPLICATE</C>, <C>TRY_AGAIN_LATER</C> or <C>ERROR</C>. Only{" "}
+          <C>ERROR</C> is a rejection. <C>result.status</C> then ends as <C>SUCCESS</C> or <C>FAILED</C>. Still <C>NOT_FOUND</C>{" "}
+          means the result is unknown: keep checking the same hash, and never send a new transaction for it.
+        </P>
+        <P>
+          If the simulation says the contract's data has expired, restore it first (a separate transaction built from{" "}
+          <C>sim.restorePreamble</C>), then start again.
         </P>
       </Section>
 
       <Section id="auth-entry" title="Sign an authorization entry">
-        <FileCode name="example.ts" code={`const { signedAuthEntry } = await beacon.signAuthEntry(preimageBase64);`} />
+        <P>
+          Use <C>authorizeEntry</C> from the Stellar SDK. It builds the preimage for you; Beacon only signs it. Choose an expiry that
+          is soon: the wallet refuses an authorization that stays valid for more than about a day.
+        </P>
+        <FileCode
+          name="example.ts"
+          code={`import { authorizeEntry } from "@stellar/stellar-sdk";
+
+const { sequence } = await server.getLatestLedger();
+const validUntil = sequence + 100; // about 8 minutes
+
+const signed = await authorizeEntry(
+  entry, // a SorobanAuthorizationEntry from the simulation
+  async (preimage) => {
+    const { signedAuthEntry } = await beacon.signAuthEntry(preimage.toXDR("base64"));
+    return Buffer.from(signedAuthEntry, "base64");
+  },
+  validUntil,
+  network.passphrase,
+);`}
+        />
+        <P>
+          The wallet reads the entry before it signs. It must be a real authorization for the network the wallet is on. The approval
+          screen lists every call the entry allows and every token transfer inside it.
+        </P>
       </Section>
     </DocPage>
   );
@@ -145,8 +184,10 @@ beacon.on("networkChanged", (network) => console.log(network));`}
           ]}
         />
         <Callout tone="warn">
-          Call <C>getNetwork()</C> after <C>login()</C>. Before sign-in the SDK reports testnet unless your code sets{" "}
-          <C>defaultNetwork</C>.
+          Use the <C>network</C> that <C>login()</C> returns, or call <C>getNetwork()</C> after it. Before sign-in the SDK only knows a
+          default (testnet unless your code sets <C>defaultNetwork</C>), and the standard wallet interface reports no network until
+          the wallet connects. The SDK also adds the active network to every signing request and refuses one for another network
+          (code -3).
         </Callout>
       </Section>
 
