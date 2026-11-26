@@ -14,6 +14,7 @@ export type App = {
 export type AppUser = {
   address: string;
   email: string | null;
+  method?: "google" | "email" | "passkey" | null; // how they signed in
   first_seen: number;
   last_seen: number;
 };

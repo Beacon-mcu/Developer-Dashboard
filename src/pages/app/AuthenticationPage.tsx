@@ -4,8 +4,8 @@ import { ErrorNote, PageHeader } from "../../components/ui";
 import { api } from "../../lib/api";
 import { useApp } from "./AppLayout";
 
-// The ways people can sign in to this app. Google is always on (an app needs at least one way to sign in).
-// External wallets (Freighter, xBull, LOBSTR, ...) can be switched on: the SDK then shows them next to Google.
+// The ways people can sign in to this app. At least one of Google, email or passkeys stays on: those give a Beacon wallet.
+// External wallets (Freighter, xBull, LOBSTR, ...) can be switched on too: the SDK then shows them next to the others.
 
 function GoogleG() {
   return (
@@ -56,15 +56,19 @@ export function AuthenticationPage() {
   const walletsOn = app.auth_methods.includes("wallets");
   const passkeyOn = app.auth_methods.includes("passkey");
   const emailOn = app.auth_methods.includes("email");
+  const googleOn = app.auth_methods.includes("google");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const setMethod = async (method: "wallets" | "passkey" | "email", on: boolean) => {
+  // An app needs at least one way that gives people a Beacon wallet: Google, email or a passkey.
+  const beaconOn = [googleOn, emailOn, passkeyOn].filter(Boolean).length;
+  const isLast = (on: boolean) => on && beaconOn === 1;
+
+  const setMethod = async (method: "google" | "wallets" | "passkey" | "email", on: boolean) => {
     setBusy(true);
     setError(null);
     try {
       const methods = new Set(app.auth_methods);
-      methods.add("google");
       if (on) methods.add(method);
       else methods.delete(method);
       setApp(await api.updateApp(app.client_id, { auth_methods: [...methods] }));
@@ -79,8 +83,22 @@ export function AuthenticationPage() {
     <>
       <PageHeader title="Authentication" description="How people sign in to this app." />
       <div className="max-w-3xl space-y-3">
-        <Row icon={<GoogleG />} title="Google" hint="Always on. An app needs at least one way to sign in.">
-          <Switch on locked label="Google sign-in" />
+        <Row
+          icon={<GoogleG />}
+          title="Google"
+          hint={
+            isLast(googleOn)
+              ? "Turn on email or passkeys first. An app needs at least one of Google, email or passkeys."
+              : "Let people sign in with their Google account."
+          }
+        >
+          <Switch
+            on={googleOn}
+            locked={isLast(googleOn)}
+            busy={busy}
+            label="Google sign-in"
+            onChange={(next) => void setMethod("google", next)}
+          />
         </Row>
 
         <Row
@@ -96,7 +114,7 @@ export function AuthenticationPage() {
           title="Email"
           hint="Let people sign in with a 6-digit code sent to their email. Shown at the top of the sign-in window."
         >
-          <Switch on={emailOn} busy={busy} label="Email" onChange={(next) => void setMethod("email", next)} />
+          <Switch on={emailOn} locked={isLast(emailOn)} busy={busy} label="Email" onChange={(next) => void setMethod("email", next)} />
         </Row>
 
         <Row
@@ -104,7 +122,7 @@ export function AuthenticationPage() {
           title="Passkeys"
           hint="Let people sign in with their fingerprint, face or screen lock. Shown next to Google when they sign in."
         >
-          <Switch on={passkeyOn} busy={busy} label="Passkeys" onChange={(next) => void setMethod("passkey", next)} />
+          <Switch on={passkeyOn} locked={isLast(passkeyOn)} busy={busy} label="Passkeys" onChange={(next) => void setMethod("passkey", next)} />
         </Row>
 
         {error && <ErrorNote>{error}</ErrorNote>}

@@ -89,6 +89,14 @@ export default function DocsLayout() {
           <Link to="/pricing" className="hidden rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:bg-subtle sm:block">
             Pricing
           </Link>
+          <a
+            href="https://tally.so/r/aOdByE"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:bg-subtle"
+          >
+            Feedback
+          </a>
           <button onClick={toggle} aria-label="Switch theme" className="rounded-md p-2 text-ink-soft hover:bg-subtle">
             <Icon name={theme === "dark" ? "sun" : "moon"} className="h-[18px] w-[18px]" />
           </button>

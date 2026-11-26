@@ -161,6 +161,14 @@ export function Shell() {
             >
               Pricing
             </NavLink>
+            <a
+              href="https://tally.so/r/aOdByE"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-md px-2.5 py-1.5 text-sm font-medium text-muted transition hover:text-ink"
+            >
+              Feedback
+            </a>
             <ProfileMenu />
           </div>
         </header>
