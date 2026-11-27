@@ -162,6 +162,14 @@ export function Shell() {
               Pricing
             </NavLink>
             <a
+              href="https://docs.google.com/presentation/d/1OkhfNy8Rs-Y4naJq-8VGG4yi9fRtYj5ZdfsaBdqZrJo/present"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden rounded-md px-2.5 py-1.5 text-sm font-medium text-muted transition hover:text-ink sm:block"
+            >
+              Slides
+            </a>
+            <a
               href="https://tally.so/r/aOdByE"
               target="_blank"
               rel="noopener noreferrer"

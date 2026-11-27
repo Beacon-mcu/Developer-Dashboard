@@ -90,6 +90,14 @@ export default function DocsLayout() {
             Pricing
           </Link>
           <a
+            href="https://docs.google.com/presentation/d/1OkhfNy8Rs-Y4naJq-8VGG4yi9fRtYj5ZdfsaBdqZrJo/present"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden rounded-lg px-3 py-1.5 text-sm text-ink-soft hover:bg-subtle sm:block"
+          >
+            Slides
+          </a>
+          <a
             href="https://tally.so/r/aOdByE"
             target="_blank"
             rel="noopener noreferrer"
