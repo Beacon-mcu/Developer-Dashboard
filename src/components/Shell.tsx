@@ -1,191 +1,90 @@
-import { useEffect, useState, type ReactNode } from "react";
-import { Link, NavLink, Outlet, useLocation, useMatch } from "react-router-dom";
-import { useAuth } from "../auth/AuthContext";
-import { appsCache } from "../lib/cache";
-import { Icon, type IconName } from "./Icon";
-import { ProfileMenu } from "./ProfileMenu";
+import { useEffect, useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import { grainMask } from "../lib/grain";
+import { Header } from "./sections/Header";
+import { Sidebar } from "./sections/Sidebar";
 
-const SECTION_LABELS: Record<string, string> = {
-  playground: "Playground",
-  users: "Users",
-  authentication: "Authentication",
-  settings: "Settings",
-  domains: "Domains",
-};
+const COLLAPSED_KEY = "beacon.sidebar.collapsed";
 
-function NavItem({ to, icon, label, end }: { to: string; icon: IconName; label: string; end?: boolean }) {
-  return (
-    <NavLink
-      to={to}
-      end={end}
-      className={({ isActive }) =>
-        `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
-          isActive ? "bg-brand-soft text-brand-text" : "text-ink-soft hover:bg-subtle hover:text-ink"
-        }`
-      }
-    >
-      <Icon name={icon} className="h-[18px] w-[18px]" />
-      {label}
-    </NavLink>
-  );
-}
+// The bottom-left wash behind the sidebar, the same grain as the sign-in card's glow.
+const SWEEP = "radial-gradient(ellipse 60% 45% at 0% 100%, black 15%, transparent 70%)";
 
-const GroupLabel = ({ children }: { children: ReactNode }) => (
-  <p className="px-3 pb-1 pt-4 text-xs font-medium text-muted">{children}</p>
-);
-
-// The signed-in frame: a sidebar on the left (a slide-out drawer on phones), a top bar with the
-// breadcrumb and the profile menu, and the page filling the rest.
+// The signed-in frame, styled like the sign-in page: the sidebar sits on the grainy page background, the content
+// is an inset rounded panel beside it. The sidebar retracts to an icon rail on large screens and becomes a
+// slide-out drawer on phones. The pieces live in ./sections.
 export function Shell() {
-  const { email } = useAuth();
   const location = useLocation();
   const [drawer, setDrawer] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => localStorage.getItem(COLLAPSED_KEY) === "1");
 
-  // Which app (if any) is open: the sidebar shows that app's pages.
-  const appMatch = useMatch("/apps/:appSlug/*");
-  const appSlug = appMatch?.params.appSlug; // the app's name in the address, e.g. "my-app"
-  const app = appSlug ? appsCache.findBySlug(appSlug) : null;
-  const section = appMatch?.params["*"]?.split("/")[0] ?? "";
+  const toggleSidebar = () =>
+    setCollapsed((c) => {
+      localStorage.setItem(COLLAPSED_KEY, c ? "0" : "1");
+      return !c;
+    });
 
   // Close the drawer after navigating.
   useEffect(() => setDrawer(false), [location.pathname]);
 
-  const sidebar = (
-    <div className="flex h-full flex-col">
-      <div className="flex h-14 shrink-0 items-center justify-between px-5">
-        <Link to={email ? "/apps" : "/docs"} className="text-lg font-semibold tracking-tight text-ink">
-          Beacon
-        </Link>
-        <button
-          onClick={() => setDrawer(false)}
-          aria-label="Close menu"
-          className="rounded-md p-1 text-muted hover:bg-subtle lg:hidden"
-        >
-          <Icon name="close" className="h-5 w-5" />
-        </button>
-      </div>
-
-      <nav className="flex-1 overflow-y-auto px-3 pb-4">
-        {email && (
-          <>
-            <GroupLabel>Workspace</GroupLabel>
-            <NavItem to="/apps" end icon="apps" label="Apps" />
-          </>
-        )}
-
-        {email && appSlug && (
-          <>
-            <GroupLabel>{app ? app.name : "Current app"}</GroupLabel>
-            <div className="space-y-0.5">
-              <NavItem to={`/apps/${appSlug}`} end icon="home" label="Overview" />
-              <NavItem to={`/apps/${appSlug}/playground`} icon="play" label="Playground" />
-              <NavItem to={`/apps/${appSlug}/users`} icon="users" label="Users" />
-              <NavItem to={`/apps/${appSlug}/authentication`} icon="key" label="Authentication" />
-              <NavItem to={`/apps/${appSlug}/settings`} icon="settings" label="Settings" />
-              <NavItem to={`/apps/${appSlug}/domains`} icon="globe" label="Domains" />
-            </div>
-          </>
-        )}
-
-        <GroupLabel>Resources</GroupLabel>
-        <NavItem to="/docs" icon="book" label="Documentation" />
-      </nav>
-
-      <p className="shrink-0 border-t border-line px-5 py-4 text-xs text-muted">Powered by Beacon · Built on Stellar</p>
-    </div>
-  );
+  // Ctrl+B / Cmd+B toggles the sidebar, as in most editors.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "b") {
+        e.preventDefault();
+        toggleSidebar();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <div className="min-h-dvh bg-canvas">
-      {/* desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line bg-surface lg:block">{sidebar}</aside>
+      {/* the page background: light paper grain everywhere, a denser brand wash low behind the sidebar */}
+      <div aria-hidden className="pointer-events-none fixed inset-0">
+        <div className="absolute inset-0 bg-brand opacity-[0.08]" style={grainMask()} />
+        <div className="absolute inset-0 bg-brand opacity-40" style={grainMask(SWEEP)} />
+      </div>
 
-      {/* phone drawer */}
+      {/* large screens: the sidebar, full width or an icon rail, straight on the background */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-30 hidden transition-[width] duration-200 lg:block ${collapsed ? "w-16" : "w-60"}`}
+      >
+        <Sidebar collapsed={collapsed} onToggle={toggleSidebar} />
+      </aside>
+
+      {/* phones: slide-out drawer */}
       {drawer && (
         <div className="fixed inset-0 z-40 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setDrawer(false)} aria-hidden />
-          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-line bg-surface">{sidebar}</aside>
+          <aside className="absolute inset-y-0 left-0 w-72 max-w-[85vw] border-r border-line bg-canvas">
+            <Sidebar onClose={() => setDrawer(false)} />
+          </aside>
         </div>
       )}
 
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-line bg-surface/90 px-4 backdrop-blur sm:px-6 lg:px-10">
-          <div className="flex min-w-0 items-center gap-3">
-            <button
-              onClick={() => setDrawer(true)}
-              aria-label="Open menu"
-              className="rounded-md p-1.5 text-ink-soft hover:bg-subtle lg:hidden"
-            >
-              <Icon name="menu" className="h-5 w-5" />
-            </button>
-            <span className="text-base font-semibold tracking-tight text-ink lg:hidden">Beacon</span>
+      {/* large screens: a strip of background above the panel, so content scrolling under the sticky header
+          never shows in the gap */}
+      <div
+        aria-hidden
+        className={`fixed right-0 top-0 z-20 hidden h-3 bg-canvas transition-[left] duration-200 lg:block ${
+          collapsed ? "left-16" : "left-60"
+        }`}
+      >
+        <div className="absolute inset-0 bg-brand opacity-[0.08]" style={grainMask()} />
+      </div>
 
-            <nav aria-label="Breadcrumb" className="hidden min-w-0 items-center gap-2 text-sm lg:flex">
-              {location.pathname.startsWith("/docs") ? (
-                <span className="font-medium text-ink">Documentation</span>
-              ) : location.pathname.startsWith("/pricing") ? (
-                <span className="font-medium text-ink">Pricing</span>
-              ) : (
-                <>
-                  <Link to="/apps" className={appSlug ? "text-muted hover:text-ink" : "font-medium text-ink"}>
-                    Apps
-                  </Link>
-                  {appSlug && (
-                    <>
-                      <span className="text-muted">/</span>
-                      <Link
-                        to={`/apps/${appSlug}`}
-                        className={`truncate ${section ? "text-muted hover:text-ink" : "font-medium text-ink"}`}
-                      >
-                        {app?.name ?? "App"}
-                      </Link>
-                    </>
-                  )}
-                  {section && SECTION_LABELS[section] && (
-                    <>
-                      <span className="text-muted">/</span>
-                      <span className="font-medium text-ink">{SECTION_LABELS[section]}</span>
-                    </>
-                  )}
-                </>
-              )}
-            </nav>
-          </div>
+      <div className={`relative transition-[padding] duration-200 lg:py-3 lg:pr-3 ${collapsed ? "lg:pl-16" : "lg:pl-60"}`}>
+        {/* the content panel */}
+        <div className="min-h-dvh bg-surface lg:min-h-[calc(100dvh-1.5rem)] lg:rounded-2xl lg:border lg:border-line lg:shadow-sm">
+          <Header onOpenDrawer={() => setDrawer(true)} />
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-3">
-            <NavLink
-              to="/pricing"
-              className={({ isActive }) =>
-                `rounded-md px-2.5 py-1.5 text-sm font-medium transition ${isActive ? "text-ink" : "text-muted hover:text-ink"}`
-              }
-            >
-              Pricing
-            </NavLink>
-            <a
-              href="https://docs.google.com/presentation/d/1OkhfNy8Rs-Y4naJq-8VGG4yi9fRtYj5ZdfsaBdqZrJo/present"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden rounded-md px-2.5 py-1.5 text-sm font-medium text-muted transition hover:text-ink sm:block"
-            >
-              Slides
-            </a>
-            <a
-              href="https://tally.so/r/aOdByE"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-md px-2.5 py-1.5 text-sm font-medium text-muted transition hover:text-ink"
-            >
-              Feedback
-            </a>
-            <ProfileMenu />
-          </div>
-        </header>
-
-        <main className="px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
-          <div className="mx-auto w-full max-w-[1400px]">
-            <Outlet />
-          </div>
-        </main>
+          <main className="px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+            <div className="mx-auto w-full max-w-[1400px]">
+              <Outlet />
+            </div>
+          </main>
+        </div>
       </div>
     </div>
   );

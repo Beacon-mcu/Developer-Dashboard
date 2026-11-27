@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Card, CodeBlock, CopyButton, PageHeader, PromptBlock, Stat } from "../../components/ui";
-import { buildPrompt } from "../../lib/prompt";
+import { Card, CodeBlock, CopyButton, PageHeader, Stat } from "../../components/ui";
 import { api } from "../../lib/api";
 import { formatDate } from "../../lib/format";
 import { useApp } from "./AppLayout";
@@ -82,15 +81,6 @@ console.log(address); // a Stellar address (G...)`;
         >
           <CodeBlock language="bash" code="npm install @beaconmcu/auth" />
           <CodeBlock language="ts" code={code} />
-        </Card>
-      </div>
-
-      <div className="mt-6">
-        <Card
-          title="Build with AI"
-          subtitle="Copy this prompt into Claude, ChatGPT, Cursor or any AI coding tool. It already has this app's Client ID and network. Replace the line in square brackets with what you want to build."
-        >
-          <PromptBlock prompt={buildPrompt({ clientId: app.client_id, network: app.network })} />
         </Card>
       </div>
     </>

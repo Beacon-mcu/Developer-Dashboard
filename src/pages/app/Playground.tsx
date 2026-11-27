@@ -55,13 +55,6 @@ export default function Playground() {
         }
       />
 
-      <div className="mb-6">
-        <WarnNote>
-          Signing in here is a real login: you become one of this app's users (you'll see yourself under Users).
-          {app.network === "mainnet" ? " This app's default network is Mainnet, which uses real XLM." : ""}
-        </WarnNote>
-      </div>
-
       <div className="grid grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_28rem]">
         <div className="min-w-0 space-y-6">
           <Connection
@@ -100,6 +93,11 @@ export default function Playground() {
           <EventLog logs={logs} onClear={clearLogs} />
         </div>
       </div>
+
+      <p className="mt-6 text-sm text-muted">
+        Signing in here is a real login: you become one of this app's users (you'll see yourself under Users).
+        {app.network === "mainnet" ? " This app's default network is Mainnet, which uses real XLM." : ""}
+      </p>
     </>
   );
 }

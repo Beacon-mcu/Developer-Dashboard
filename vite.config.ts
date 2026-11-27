@@ -1,3 +1,4 @@
+import path from "node:path";
 import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -28,6 +29,7 @@ function llmsTxt(): Plugin {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), llmsTxt()],
+  resolve: { alias: { "@": path.resolve(__dirname, "src") } }, // shadcn components import from "@/..."
   server: { port: 5173, strictPort: true },
   build: {
     rollupOptions: {

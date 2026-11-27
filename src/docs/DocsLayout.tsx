@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { Icon } from "../components/Icon";
+import { Logo } from "../components/Logo";
 import { useTheme } from "../lib/theme";
 import { GROUPS, PAGES, pathOf } from "./registry";
 
@@ -80,8 +81,8 @@ export default function DocsLayout() {
           <button onClick={() => setMenu(true)} aria-label="Open menu" className="rounded-md p-1.5 text-ink-soft hover:bg-subtle lg:hidden">
             <Icon name="menu" className="h-5 w-5" />
           </button>
-          <Link to="/docs" className="text-lg font-semibold tracking-tight text-ink">
-            Beacon
+          <Link to="/docs" className="text-ink">
+            <Logo className="h-6" />
           </Link>
           <span className="rounded-full bg-subtle px-2 py-0.5 text-xs font-medium text-muted">Docs</span>
         </div>
